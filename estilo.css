@@ -1,0 +1,245 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   SISTEMA CLÍNICO ATENEA — estilos
+
+   Sobrio a propósito: esto lo mira alguien cansado a las 4 de la mañana.
+   Nada de colores alegres; el color acá significa algo — verde estable,
+   ámbar delicado, rojo crítico.
+
+   Pensado para el teléfono primero. En el computador crece a dos columnas.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root{
+  --tinta:#16211D; --tinta-2:#243330;
+  --verde:#2F7D5C; --verde-osc:#1D5540; --verde-cl:#E8F2EE;
+  --ambar:#9A7420; --ambar-cl:#FBF3E1;
+  --rojo:#B04430; --rojo-cl:#FAEDE9;
+  --azul:#3B6A8F; --azul-cl:#EAF1F6;
+  --fondo:#F4F6F5; --panel:#FFFFFF; --linea:#E1E5E2; --linea-2:#EDEFEC;
+  --texto:#18201C; --gris:#5F6A64; --gris-cl:#98A29B;
+  --display:"Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --cuerpo:"Work Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --sombra:0 1px 3px rgba(20,35,30,.06),0 8px 24px rgba(20,35,30,.04);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fondo);color:var(--texto);
+     font:400 15.5px/1.55 var(--cuerpo);-webkit-font-smoothing:antialiased;
+     padding-bottom:76px}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.025em;line-height:1.12;margin:0}
+button,input,select,textarea{font:inherit}
+.oculto{display:none!important}
+
+/* ── Login ────────────────────────────────────────────────────────── */
+#pantallaLogin:empty{display:none}
+#pantallaLogin{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-caja{background:var(--panel);border:1px solid var(--linea);border-radius:16px;
+            box-shadow:var(--sombra);padding:28px 26px;width:100%;max-width:360px}
+.login-caja .marca{padding:0 0 22px;justify-content:center;text-align:center;flex-direction:column;gap:8px}
+.login-caja .marca h1{font-size:20px}
+
+/* ── Estructura general: sidebar + columna de contenido ──────────── */
+body{padding-bottom:0}
+.app{min-height:100vh}
+@media(min-width:760px){.app{display:flex}}
+
+.lateral{background:var(--panel);border-right:1px solid var(--linea);
+         width:250px;flex:0 0 250px;padding:18px 14px}
+.marca{display:flex;align-items:center;gap:11px;padding:2px 6px 18px}
+.marca .logo{width:36px;height:36px;border-radius:50%;background:var(--verde-cl);flex:0 0 36px;
+             overflow:hidden;position:relative;display:grid;place-content:center;
+             font-size:11px;color:var(--verde-osc);font-weight:700}
+.marca .logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.marca h1{font-size:16.5px}
+.marca .sub{font-size:11px;color:var(--gris);letter-spacing:.03em;font-weight:600}
+
+/* Menú lateral, agrupado por título */
+#menu .grupo-titulo{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
+                     color:var(--gris-cl);font-weight:700;padding:14px 10px 6px}
+#menu button{display:flex;align-items:center;gap:11px;width:100%;border:0;background:none;
+             text-align:left;padding:9px 10px;border-radius:9px;cursor:pointer;
+             color:var(--texto);font-size:14px;font-weight:500;margin-bottom:1px}
+#menu button .ic{font-size:16px;width:19px;text-align:center;flex:0 0 auto}
+#menu button:hover{background:var(--linea-2)}
+#menu button[aria-current="true"]{background:var(--verde-cl);color:var(--verde-osc);font-weight:600}
+#menu button .prox{margin-left:auto;font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;
+                    color:var(--gris-cl);font-weight:700}
+
+/* Fuera del escritorio, el sidebar es un cajón que se abre encima */
+@media(max-width:759px){
+  .lateral{position:fixed;inset:0 auto 0 0;z-index:50;transform:translateX(-100%);
+           transition:transform .18s ease;box-shadow:0 0 0 rgba(0,0,0,0);width:270px}
+  .lateral.abierto{transform:translateX(0);box-shadow:14px 0 30px rgba(20,35,30,.14)}
+  .velo-lateral{position:fixed;inset:0;background:rgba(15,25,20,.4);z-index:45;
+                opacity:0;pointer-events:none;transition:opacity .18s ease}
+  .velo-lateral.abierto{opacity:1;pointer-events:auto}
+}
+@media(min-width:760px){.velo-lateral{display:none}}
+
+.col{flex:1;min-width:0}
+.topbar{background:var(--panel);border-bottom:1px solid var(--linea);position:sticky;top:0;z-index:30;
+        display:flex;align-items:center;padding:12px 16px}
+.hamb{border:0;background:none;font-size:19px;cursor:pointer;color:var(--texto);padding:4px 6px}
+@media(min-width:760px){.hamb{display:none}}
+.topbar .quien{text-align:right;font-size:12.5px;color:var(--gris)}
+.topbar .quien b{display:block;color:var(--texto);font-size:14px;font-weight:600}
+
+.caja{max-width:1120px;margin:0 auto;padding:0 16px}
+main{padding:18px 0 40px}
+
+/* ── Títulos de sección ───────────────────────────────────────────── */
+.encab{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;
+       margin-bottom:16px;flex-wrap:wrap}
+.encab h2{font-size:23px}
+.encab .sub{color:var(--gris);font-size:14px;margin-top:2px}
+.reloj{font-family:var(--display);font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;
+       color:var(--texto)}
+
+/* ── Tarjetas de paciente ─────────────────────────────────────────── */
+.lista{display:grid;gap:12px}
+@media(min-width:700px){.lista{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}}
+.tarjeta{background:var(--panel);border:1px solid var(--linea);border-radius:14px;
+         box-shadow:var(--sombra);overflow:hidden;text-align:left;width:100%;
+         padding:0;cursor:pointer;display:block;font:inherit;color:inherit}
+.tarjeta .tira{height:4px}
+.t-estable{background:var(--verde)} .t-delicado{background:var(--ambar)}
+.t-critico{background:var(--rojo)}  .t-cerrado{background:var(--gris-cl)}
+.tarjeta .adentro{padding:14px 15px}
+.tarjeta .fila1{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:2px}
+.tarjeta h3{font-size:19px}
+.tarjeta .meta{color:var(--gris);font-size:13px}
+.tarjeta .motivo{color:var(--gris);font-size:13.5px;margin-top:3px}
+.tarjeta .pie{display:flex;gap:14px;flex-wrap:wrap;margin-top:11px;
+              padding-top:11px;border-top:1px solid var(--linea-2);font-size:13px}
+.tarjeta .pie div span{display:block;font-size:10.5px;color:var(--gris-cl);
+                       text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.tarjeta .pie div b{font-weight:600;font-variant-numeric:tabular-nums}
+
+.chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;
+      white-space:nowrap}
+.c-estable{background:var(--verde-cl);color:var(--verde-osc)}
+.c-delicado{background:var(--ambar-cl);color:var(--ambar)}
+.c-critico{background:var(--rojo-cl);color:var(--rojo)}
+.c-cerrado{background:#EEF0EE;color:var(--gris)}
+.c-box{background:var(--azul-cl);color:var(--azul)}
+
+.aviso-tutor{margin-top:10px;background:var(--rojo-cl);color:var(--rojo);border-radius:9px;
+             padding:8px 11px;font-size:12.5px;font-weight:500}
+
+/* ── Ficha ────────────────────────────────────────────────────────── */
+.panel{background:var(--panel);border:1px solid var(--linea);border-radius:14px;
+       box-shadow:var(--sombra);margin-bottom:14px;overflow:hidden}
+.panel > h3{font-size:15px;padding:13px 16px;border-bottom:1px solid var(--linea);
+            display:flex;justify-content:space-between;align-items:center;gap:10px}
+.panel .adentro{padding:15px 16px}
+.rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:13px}
+.dato .e{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--gris-cl);font-weight:600}
+.dato .v{font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+@media(min-width:900px){.ficha-cols{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;align-items:start}}
+
+.evento{padding:12px 16px;border-bottom:1px solid var(--linea-2)}
+.evento:last-child{border-bottom:0}
+.evento .cab{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+             font-size:12.5px;color:var(--gris);margin-bottom:3px}
+.evento .cab b{color:var(--texto);font-weight:600}
+.evento p{margin:0;font-size:14.5px}
+.evento .tutor{margin-top:7px;background:var(--verde-cl);border-radius:8px;padding:8px 11px;
+               font-size:13.5px}
+.evento .tutor b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
+                 color:var(--verde-osc);margin-bottom:3px}
+
+/* ── Formularios ──────────────────────────────────────────────────── */
+.campo{display:block;margin-bottom:13px}
+.campo > span{display:block;font-size:11px;font-weight:600;color:var(--gris);margin-bottom:5px;
+              text-transform:uppercase;letter-spacing:.07em}
+.campo input,.campo select,.campo textarea{width:100%;padding:11px 12px;border:1px solid var(--linea);
+      border-radius:10px;background:var(--panel);color:var(--texto)}
+.campo textarea{min-height:78px;resize:vertical}
+.campo input:focus,.campo select:focus,.campo textarea:focus{
+      outline:2px solid var(--verde-cl);border-color:var(--verde)}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.bot{border:0;border-radius:10px;padding:12px 18px;font-weight:600;cursor:pointer;
+     background:var(--verde);color:#fff;font-size:15px}
+.bot.claro{background:var(--verde-cl);color:var(--verde-osc)}
+.bot.linea{background:transparent;border:1px solid var(--linea);color:var(--texto)}
+.bot.peligro{background:var(--rojo-cl);color:var(--rojo)}
+.bot.chico{padding:8px 13px;font-size:13.5px;border-radius:9px}
+.bot:focus-visible{outline:3px solid var(--verde-cl);outline-offset:2px}
+.botones{display:flex;gap:9px;flex-wrap:wrap}
+
+/* ── Ventana emergente ────────────────────────────────────────────── */
+.velo{position:fixed;inset:0;background:rgba(15,25,20,.45);z-index:60;
+      display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:700px){.velo{align-items:center}}
+.modal{background:var(--panel);width:100%;max-width:520px;max-height:92vh;overflow-y:auto;
+       border-radius:18px 18px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.modal{border-radius:16px;padding:22px}}
+.modal h3{font-size:20px;margin-bottom:4px}
+.modal .aclara{color:var(--gris);font-size:13.5px;margin-bottom:16px}
+
+/* ── Boxes ────────────────────────────────────────────────────────── */
+.boxes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.box{background:var(--panel);border:1px solid var(--linea);border-radius:13px;padding:14px;
+     text-align:center}
+.box.ocupado{border-color:var(--verde);background:var(--verde-cl)}
+.box .n{font-family:var(--display);font-size:17px;font-weight:700}
+.box .q{font-size:13px;color:var(--gris);margin-top:4px}
+
+/* ── Cuenta ───────────────────────────────────────────────────────── */
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
+   color:var(--gris-cl);font-weight:700;padding:9px 16px;border-bottom:1px solid var(--linea)}
+td{padding:10px 16px;border-bottom:1px solid var(--linea-2);font-size:14.5px}
+tr:last-child td{border-bottom:0}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.total{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px;
+       border-top:2px solid var(--linea);font-family:var(--display);font-size:21px;font-weight:700}
+
+/* ── Bienvenida (inicio) ──────────────────────────────────────────── */
+.tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:16px}
+.tile{background:var(--panel);border:1px solid var(--linea);border-radius:14px;box-shadow:var(--sombra);
+      padding:15px 16px}
+.tile .e{font-size:12px;color:var(--gris);font-weight:600;margin-bottom:6px}
+.tile .v{font-family:var(--display);font-size:27px;font-weight:700}
+.tile.critico .v{color:var(--rojo)}
+.proximamente{background:var(--panel);border:1px dashed var(--linea);border-radius:14px;
+      padding:40px 20px;text-align:center;color:var(--gris)}
+.proximamente .ic{font-size:30px;display:block;margin-bottom:10px}
+
+/* ── Grilla de fármacos: filas = fármacos, columnas = horas del día ── */
+.grilla-farmacos{border-collapse:collapse;font-size:12.5px}
+.grilla-farmacos th,.grilla-farmacos td{border:1px solid var(--linea-2);text-align:center;padding:0}
+.grilla-farmacos thead th{background:var(--linea-2);font-weight:700;color:var(--gris);
+      padding:6px 3px;font-size:10.5px}
+.grilla-farmacos thead th.ahora{background:var(--verde-cl);color:var(--verde-osc)}
+.grilla-farmacos td:first-child,.grilla-farmacos th:first-child{
+      position:sticky;left:0;background:var(--panel);text-align:left;padding:8px 10px;
+      min-width:160px;font-weight:600;white-space:nowrap;z-index:1}
+.grilla-farmacos thead th:first-child{background:var(--linea-2);z-index:2}
+.celda-hora{width:29px;height:34px;cursor:pointer}
+.celda-hora:hover{background:var(--verde-cl)}
+.celda-hora.marcada{background:var(--verde);position:relative}
+.celda-hora.marcada::after{content:"✓";color:#fff;font-weight:700;font-size:12.5px}
+.quitar-fila{border:0;background:none;color:var(--gris-cl);cursor:pointer;margin-left:6px;
+      font-size:11.5px;vertical-align:middle}
+.quitar-fila:hover{color:var(--rojo)}
+
+/* ── Detalle de cuenta (imprimible) ───────────────────────────────── */
+.detalle-encab{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+      flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--linea)}
+.detalle-nota{margin-top:14px;color:var(--gris);font-size:12.5px}
+@media print{
+  .lateral,.velo-lateral,.topbar,.no-imprimir,#ventana{display:none!important}
+  body{background:#fff;padding-bottom:0}
+  .caja{max-width:100%;padding:0}
+  main{padding:0}
+  .panel{box-shadow:none;border:0}
+}
+
+.vacio{color:var(--gris-cl);text-align:center;padding:34px 16px;font-size:14.5px}
+.sello-demo{background:var(--ambar-cl);border:1px solid #EBDCBE;border-radius:10px;
+            padding:10px 13px;font-size:12.5px;color:#6B5510;margin-bottom:16px}
+@media(prefers-reduced-motion:no-preference){
+  .tarjeta{transition:transform .14s ease,box-shadow .14s ease}
+  .tarjeta:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(20,35,30,.09)}
+}

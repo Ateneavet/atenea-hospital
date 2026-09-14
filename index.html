@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Atenea">
+<title>Software clínico · Atenea</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="estilo.css?v=4">
+</head>
+<body>
+
+<div id="pantallaLogin"></div>
+
+<div class="app oculto" id="appShell">
+
+  <aside class="lateral" id="lateral">
+    <div class="marca">
+      <div class="logo"><img alt="" id="logoClinica">A</div>
+      <div>
+        <h1 id="nombreClinica">Atenea</h1>
+        <div class="sub" id="subClinica">Software clínico</div>
+      </div>
+    </div>
+    <nav id="menu"></nav>
+  </aside>
+
+  <div class="velo-lateral" id="veloLateral" onclick="cerrarLateral()"></div>
+
+  <div class="col">
+    <div class="topbar">
+      <button class="hamb" id="botHamb" aria-label="Abrir menú">☰</button>
+      <button class="quien" id="botUsuario" style="border:0;background:none;cursor:pointer;margin-left:auto">
+        <b id="usuarioActual">—</b>
+        <span>cerrar sesión</span>
+      </button>
+    </div>
+    <main class="caja" id="vista"></main>
+  </div>
+
+</div>
+
+<div id="ventana"></div>
+
+<!-- Cliente de Supabase (la librería), y después supabase.js, que la usa
+     para conectarse al proyecto real — ahí se configuran la URL y la
+     llave. datos.js: el catálogo y los datos de ejemplo que faltan por
+     conectar. nucleo.js: ayudas y el motor que pinta pantallas. Las
+     pantallas van una por archivo, por dominio. sesion.js y arranque.js
+     van al final porque son quienes deciden qué se ve primero. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js?v=9"></script>
+<script src="datos.js?v=9"></script>
+<script src="nucleo.js?v=9"></script>
+<script src="vacunas.js?v=9"></script>
+<script src="bienvenida.js?v=9"></script>
+<script src="agenda.js?v=9"></script>
+<script src="peluqueria.js?v=9"></script>
+<script src="clientes.js?v=9"></script>
+<script src="hospital.js?v=9"></script>
+<script src="ficha.js?v=9"></script>
+<script src="ajustes.js?v=9"></script>
+<script src="sesion.js?v=9"></script>
+<script src="arranque.js?v=9"></script>
+</body>
+</html>
