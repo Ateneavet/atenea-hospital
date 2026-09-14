@@ -103,6 +103,23 @@ create table if not exists public.consultas (
   proximo_control       text
 );
 
+-- Vacunas aplicadas: una fila por dosis puesta en una Consulta, con su
+-- próxima fecha ya calculada (hoy + los meses que corresponda). De acá
+-- sale Recordatorios — quién tiene una vacuna vencida o por vencer.
+create table if not exists public.vacunas_aplicadas (
+  id              bigint generated always as identity primary key,
+  consulta_id     bigint references public.consultas(id) on delete set null,
+  paciente        text not null,
+  tutor           text,
+  telefono        text,
+  especie         text,
+  vacuna          text not null,
+  fecha_aplicada  date not null default current_date,
+  proxima_fecha   date not null,
+  quien           text not null,
+  avisado         boolean not null default false
+);
+
 create table if not exists public.perfiles (
   id      uuid primary key references auth.users(id) on delete cascade,
   email   text,
@@ -140,6 +157,7 @@ alter table public.cargos          enable row level security;
 alter table public.farmacos        enable row level security;
 alter table public.administraciones enable row level security;
 alter table public.consultas       enable row level security;
+alter table public.vacunas_aplicadas enable row level security;
 alter table public.perfiles        enable row level security;
 
 create policy "equipo autenticado, todo" on public.pacientes
@@ -154,12 +172,15 @@ create policy "equipo autenticado, todo" on public.administraciones
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "equipo autenticado, todo" on public.consultas
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "equipo autenticado, todo" on public.vacunas_aplicadas
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "equipo autenticado lee perfiles" on public.perfiles
   for select using (auth.role() = 'authenticated');
 
 -- ── Para que un cambio en un aparato se vea al tiro en los demás ───────
 alter publication supabase_realtime add table
-  public.pacientes, public.eventos, public.cargos, public.farmacos, public.administraciones, public.consultas;
+  public.pacientes, public.eventos, public.cargos, public.farmacos, public.administraciones,
+  public.consultas, public.vacunas_aplicadas;
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- DATOS DE EJEMPLO — los mismos tres pacientes que ya se le mostraron:

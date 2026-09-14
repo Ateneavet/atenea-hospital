@@ -55,6 +55,7 @@ const buscarItem = id => CATALOGO_PLANO.find(i => i.id === id);
 let BD = {
   pacientes: [],
   consultas: [],
+  vacunas: [],
   usuario: null,
   clientes: clientesEjemplo(),
   agenda: agendaEjemplo(),
@@ -72,11 +73,12 @@ const SECCIONES = [
     { id: "bienvenida", ic: "🏠", texto: "Bienvenida" },
   ]},
   { grupo: "Clínica & pacientes", items: [
-    { id: "consultas",  ic: "🩺", texto: "Consultas" },
-    { id: "hospital",   ic: "🏥", texto: "Hospital" },
-    { id: "agenda",     ic: "🗓️", texto: "Agenda & recepción" },
-    { id: "clientes",   ic: "🐾", texto: "Clientes & pacientes" },
-    { id: "peluqueria", ic: "✂️", texto: "Peluquería" },
+    { id: "consultas",     ic: "🩺", texto: "Consultas" },
+    { id: "hospital",      ic: "🏥", texto: "Hospital" },
+    { id: "agenda",        ic: "🗓️", texto: "Agenda & recepción" },
+    { id: "recordatorios", ic: "🔔", texto: "Recordatorios" },
+    { id: "clientes",      ic: "🐾", texto: "Clientes & pacientes" },
+    { id: "peluqueria",    ic: "✂️", texto: "Peluquería" },
   ]},
   { grupo: "Caja", items: [
     { id: "caja", ic: "💳", texto: "Punto de venta & caja" },

@@ -68,6 +68,18 @@ function verConsultas() {
 
 const OPCIONES_ESTERILIZADO = ["Sí", "No", "No sabe"];
 
+const VACUNAS_POR_ESPECIE = {
+  Canina: ["Séxtuple", "Antirrábica", "KC (tos de las perreras)"],
+  Felina: ["Triple felina", "Antirrábica", "Leucemia felina"],
+  Otra: ["Antirrábica"],
+};
+const opcionesVacunaEspecie = especie =>
+  (VACUNAS_POR_ESPECIE[especie] || VACUNAS_POR_ESPECIE.Otra).map(nom => `<option>${esc(nom)}</option>`).join("");
+function actualizarOpcionesVacuna(especie) {
+  const select = document.getElementById("selectVacuna");
+  if (select) select.innerHTML = opcionesVacunaEspecie(especie);
+}
+
 /* El botón "Nueva consulta" de un turno en Agenda deja el paciente, el
    tutor y el motivo ya escritos acá, para no volver a teclearlos — se
    usa una sola vez y se borra, así no se le queda pegado a la próxima
@@ -99,7 +111,7 @@ function verNuevaConsulta() {
           <div class="dupla">
             <label class="campo"><span>Nombre</span><input name="nombre" required value="${v("nombre")}"></label>
             <label class="campo"><span>Especie</span>
-              <select name="especie">
+              <select name="especie" onchange="actualizarOpcionesVacuna(this.value)">
                 <option ${!c || c.especie === "Canina" ? "selected" : ""}>Canina</option>
                 <option ${c?.especie === "Felina" ? "selected" : ""}>Felina</option>
                 <option ${c?.especie === "Otra" ? "selected" : ""}>Otra</option>
@@ -152,6 +164,31 @@ function verNuevaConsulta() {
         </div>
       </div>
 
+      ${!c ? `
+      <div class="panel">
+        <h3>Vacunación</h3>
+        <div class="adentro">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" name="vacuno" onchange="document.querySelector('.bloque-vacuna').classList.toggle('oculto', !this.checked)">
+            <span>Se aplicó una vacuna hoy</span>
+          </label>
+          <div class="bloque-vacuna oculto" style="margin-top:12px">
+            <div class="dupla">
+              <label class="campo"><span>Vacuna</span>
+                <select name="vacunaNombre" id="selectVacuna">${opcionesVacunaEspecie(preset?.especie || "Canina")}</select></label>
+              <label class="campo"><span>Próxima dosis en</span>
+                <select name="vacunaIntervalo">
+                  <option value="1">1 mes</option><option value="3">3 meses</option>
+                  <option value="6">6 meses</option><option value="12" selected>12 meses</option>
+                  <option value="24">24 meses</option>
+                </select></label>
+            </div>
+            <div class="aclara" style="color:var(--gris);font-size:12.5px;margin-top:-6px">
+              Con esto se calcula sola la próxima fecha y aparece en Recordatorios cuando se acerque.</div>
+          </div>
+        </div>
+      </div>` : ""}
+
       <div class="botones" style="margin-bottom:20px">
         <button class="bot" type="submit">${c ? "Guardar cambios" : "Guardar consulta"}</button>
         <button class="bot linea" type="button" onclick="ir('${c ? "detalleConsulta" : "consultas"}'${c ? `, ${c.id}` : ""})">Cancelar</button>
@@ -176,6 +213,27 @@ async function guardarConsulta(e, id) {
     ? await sb.from("consultas").update(datos).eq("id", id).select().single()
     : await sb.from("consultas").insert({ ...datos, quien: BD.usuario }).select().single();
   if (resultado.error) { alert("No se pudo guardar la consulta.\n\n" + resultado.error.message); return; }
+
+  /* Solo al crear (no al editar, para no duplicar la dosis cada vez que
+     se corrige algo): si se marcó "Se aplicó una vacuna hoy", calcula la
+     próxima fecha (hoy + los meses elegidos) y la deja guardada — de ahí
+     sale sola en Recordatorios cuando se acerque. */
+  if (!id && f.get("vacuno")) {
+    const vacunaNombre = t("vacunaNombre");
+    const meses = parseInt(f.get("vacunaIntervalo"), 10) || 12;
+    const hoyFecha = new Date();
+    const proxima = new Date(hoyFecha);
+    proxima.setMonth(proxima.getMonth() + meses);
+    const aFecha = d => d.toISOString().slice(0, 10);
+    const { error: errVacuna } = await sb.from("vacunas_aplicadas").insert({
+      consulta_id: resultado.data.id, paciente: datos.nombre, tutor: datos.tutor,
+      telefono: datos.telefono, especie: datos.especie, vacuna: vacunaNombre,
+      fecha_aplicada: aFecha(hoyFecha), proxima_fecha: aFecha(proxima), quien: BD.usuario,
+    });
+    if (errVacuna) alert("La consulta se guardó, pero no se pudo registrar la vacuna.\n\n" + errVacuna.message);
+    else await cargarVacunasDesdeSupabase();
+  }
+
   await cargarConsultasDesdeSupabase();
   ir("detalleConsulta", resultado.data.id);
 }

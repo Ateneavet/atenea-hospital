@@ -114,6 +114,21 @@ async function cargarConsultasDesdeSupabase() {
   pintar();
 }
 
+/* ── Vacunas aplicadas (recordatorios) ────────────────────────────────
+   Cada fila es una dosis puesta en una Consulta, con su próxima fecha
+   ya calculada — de ahí sale todo lo de Recordatorios. */
+
+async function cargarVacunasDesdeSupabase() {
+  const { data, error } = await sb.from("vacunas_aplicadas").select("*").order("proxima_fecha");
+  if (error) { console.error("No se pudieron leer las vacunas:", error); return; }
+  BD.vacunas = data.map(v => ({
+    id: v.id, consultaId: v.consulta_id, paciente: v.paciente, tutor: v.tutor, telefono: v.telefono,
+    especie: v.especie, vacuna: v.vacuna, fechaAplicada: v.fecha_aplicada, proximaFecha: v.proxima_fecha,
+    quien: v.quien, avisado: v.avisado,
+  }));
+  pintar();
+}
+
 /* ── Lista de precios ─────────────────────────────────────────────────
    Igual que los pacientes: se trae de Supabase y se arma con la misma
    forma que usaba el catálogo fijo de antes (grupos con items adentro),
@@ -156,6 +171,12 @@ function _programarRecargaConsultas() {
   _reintentoConsultas = setTimeout(() => cargarConsultasDesdeSupabase(), 200);
 }
 
+let _reintentoVacunas = null;
+function _programarRecargaVacunas() {
+  clearTimeout(_reintentoVacunas);
+  _reintentoVacunas = setTimeout(() => cargarVacunasDesdeSupabase(), 200);
+}
+
 function suscribirCambiosHospital() {
   sb.channel("hospital-en-vivo")
     .on("postgres_changes", { event: "*", schema: "public", table: "pacientes" }, _programarRecarga)
@@ -165,5 +186,6 @@ function suscribirCambiosHospital() {
     .on("postgres_changes", { event: "*", schema: "public", table: "administraciones" }, _programarRecarga)
     .on("postgres_changes", { event: "*", schema: "public", table: "catalogo" }, _programarRecargaCatalogo)
     .on("postgres_changes", { event: "*", schema: "public", table: "consultas" }, _programarRecargaConsultas)
+    .on("postgres_changes", { event: "*", schema: "public", table: "vacunas_aplicadas" }, _programarRecargaVacunas)
     .subscribe();
 }

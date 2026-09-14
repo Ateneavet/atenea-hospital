@@ -11,7 +11,7 @@ function verBienvenida() {
   const lista = hospitalizados();
   const criticos = lista.filter(p => p.estado === "critico").length;
   const libres = CLINICA.boxes.filter(b => !lista.some(p => p.box === b)).length;
-  const porAvisar = clientesPorAvisar();
+  const porAvisar = vacunasPorAvisar();
   const r = reloj();
   const partes = BD.usuario.split(" ");
   const primerNombre = ["Dr.", "Dra."].includes(partes[0]) ? partes[1] : partes[0];
@@ -56,7 +56,7 @@ function verBienvenida() {
       </div>
 
       <div>
-        ${panelPorAvisar(porAvisar, 4)}
+        ${panelRecordatorios(porAvisar, 4)}
       </div>
     </div>`;
 }

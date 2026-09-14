@@ -83,7 +83,7 @@ function verAgenda() {
       ${tablaAgenda(lista, "agenda")}
     </div>
 
-    ${panelPorAvisar(clientesPorAvisar())}
+    ${panelRecordatorios(vacunasPorAvisar())}
 
     <div class="sello-demo">Esta agenda todavía es de ejemplo — no hay un calendario de verdad detrás.
       Cuando se agregue, esta misma pantalla se llena sola.</div>`;
