@@ -13,7 +13,7 @@ function mostrarLogin(error) {
   document.getElementById("pantallaLogin").innerHTML = `
     <div class="login-caja">
       <div class="marca">
-        <div class="logo"><img alt="" id="logoClinicaLogin">A</div>
+        <div class="logo"><img alt="" id="logoClinicaLogin" src="logo.png">A</div>
         <div><h1>${esc(CLINICA.nombre)}</h1><div class="sub">Software clínico</div></div>
       </div>
       <form onsubmit="intentarLogin(event)">

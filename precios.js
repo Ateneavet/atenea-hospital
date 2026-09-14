@@ -9,6 +9,17 @@
    nuevo sin que tenga que recargar nada.
    ═══════════════════════════════════════════════════════════════════════ */
 
+/* Qué grupos están cerrados (plegados) — un Set en memoria, no en Supabase:
+   es solo cómo cada quien prefiere mirar la lista, se pierde al recargar
+   y no hace falta que se comparta entre computadores. */
+const GRUPOS_PRECIOS_CERRADOS = new Set();
+
+function alternarGrupoPrecios(grupo) {
+  if (GRUPOS_PRECIOS_CERRADOS.has(grupo)) GRUPOS_PRECIOS_CERRADOS.delete(grupo);
+  else GRUPOS_PRECIOS_CERRADOS.add(grupo);
+  pintar();
+}
+
 function verListaPrecios() {
   return `
     <div class="encab">
@@ -19,20 +30,23 @@ function verListaPrecios() {
       <button class="bot" onclick="ventanaAgregarItem()">+ Agregar ítem</button>
     </div>
 
-    ${CATALOGO.length ? CATALOGO.map(g => `
+    ${CATALOGO.length ? CATALOGO.map(g => { const cerrado = GRUPOS_PRECIOS_CERRADOS.has(g.grupo); return `
       <div class="panel">
-        <h3>${esc(g.grupo)}</h3>
-        <div class="adentro">
+        <h3 class="clicable" data-grupo="${esc(g.grupo)}" onclick="alternarGrupoPrecios(this.dataset.grupo)">
+          <span>${esc(g.grupo)} <span style="color:var(--gris-cl);font-weight:400;font-size:13px">· ${g.items.length}</span></span>
+          <span class="chevron${cerrado ? " cerrado" : ""}">›</span>
+        </h3>
+        ${cerrado ? "" : `<div class="adentro">
           ${g.items.map(i => `
             <div style="padding:9px 0;border-bottom:1px solid var(--linea-2);display:flex;justify-content:space-between;align-items:center;gap:10px">
               <div>${esc(i.nombre)}</div>
               <div style="display:flex;align-items:center;gap:10px">
                 <b style="font-variant-numeric:tabular-nums">${plata(i.precio)}</b>
-                <button class="bot linea chico" onclick="ventanaEditarItem('${i.id}')">Editar</button>
+                <button class="bot linea chico" onclick="event.stopPropagation();ventanaEditarItem('${i.id}')">Editar</button>
               </div>
             </div>`).join("")}
-        </div>
-      </div>`).join("") : `<div class="panel"><div class="vacio">Todavía no hay ítems cargados.</div></div>`}`;
+        </div>`}
+      </div>`}).join("") : `<div class="panel"><div class="vacio">Todavía no hay ítems cargados.</div></div>`}`;
 }
 
 function opcionesGrupoCatalogo(actual) {

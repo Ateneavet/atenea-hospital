@@ -131,6 +131,11 @@ main{padding:18px 0 40px}
 .panel > h3{font-size:15px;padding:13px 16px;border-bottom:1px solid var(--linea);
             display:flex;justify-content:space-between;align-items:center;gap:10px}
 .panel .adentro{padding:15px 16px}
+.panel > h3.clicable{cursor:pointer;user-select:none}
+.panel > h3.clicable:hover{background:var(--linea-2)}
+.panel > h3 .chevron{display:inline-block;font-size:18px;color:var(--gris-cl);
+                      transform:rotate(90deg);transition:transform .15s}
+.panel > h3 .chevron.cerrado{transform:rotate(0deg)}
 .rejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:13px}
 .dato .e{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--gris-cl);font-weight:600}
 .dato .v{font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}

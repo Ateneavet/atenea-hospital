@@ -12,14 +12,16 @@ const CLASE_ESTADO_AGENDA = {
 };
 const ESTADOS_AGENDA = ["Confirmada", "En espera", "Atendiendo", "Finalizado", "No asiste"];
 
-/* Solo recepción puede tocar el estado de una agenda — a los médicos y
-   al peluquero les queda de solo lectura. "clave" dice de qué agenda
-   viene la fila (BD.agenda o BD.agendaPeluqueria), así una sola función
-   sirve para las dos y el cambio se guarda aunque la tabla muestre solo
-   un pedazo (como en Bienvenida). */
+/* Recepción puede tocar el estado de cualquier agenda. En Peluquería,
+   además, el estado queda editable para quien la esté mirando (así el
+   peluquero puede pasarlo a "Atendiendo" o "Finalizado" sin depender de
+   recepción) — en Agenda (médicos) sigue de solo lectura. "clave" dice
+   de qué agenda viene la fila (BD.agenda o BD.agendaPeluqueria), así una
+   sola función sirve para las dos y el cambio se guarda aunque la tabla
+   muestre solo un pedazo (como en Bienvenida). */
 function tablaAgenda(lista, clave) {
   if (!lista.length) return `<div class="vacio">Sin atenciones agendadas.</div>`;
-  const puedeEditar = SESION.rol === "recepcion";
+  const puedeEditar = SESION.rol === "recepcion" || clave === "agendaPeluqueria";
   return `<div style="overflow-x:auto"><table>
     <thead><tr><th>Hora</th><th>Paciente</th><th>Servicio</th><th>Profesional</th><th>Estado</th></tr></thead>
     <tbody>${lista.map(a => {
