@@ -78,6 +78,8 @@ create table if not exists public.consultas (
   id                    bigint generated always as identity primary key,
   fecha                 timestamptz not null default now(),
   quien                 text not null,
+  estado                text not null default 'En espera'
+    check (estado in ('En espera','Atendiendo','Finalizado','Reagendado','Cancelada')),
   nombre                text not null,
   especie               text,
   raza                  text,

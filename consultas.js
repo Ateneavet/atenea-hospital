@@ -8,30 +8,60 @@
    aparte, en Hospital → "+ Ingresar paciente".
    ═══════════════════════════════════════════════════════════════════════ */
 
+const ESTADOS_CONSULTA = ["En espera", "Atendiendo", "Finalizado", "Reagendado", "Cancelada"];
+const CLASE_ESTADO_CONSULTA = {
+  "En espera": "delicado", "Atendiendo": "estable", "Finalizado": "cerrado",
+  "Reagendado": "box", "Cancelada": "critico",
+};
+
+const horaTexto = iso => new Date(iso).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
+const esHoy = iso => new Date(iso).toDateString() === new Date().toDateString();
+
+async function cambiarEstadoConsulta(id, estado) {
+  const { error } = await sb.from("consultas").update({ estado }).eq("id", id);
+  if (error) { alert("No se pudo cambiar el estado.\n\n" + error.message); return; }
+  await cargarConsultasDesdeSupabase();
+}
+
+/* Tabla al estilo de tablaAgenda(): la hora (o la fecha, para las
+   anteriores) a la izquierda, filas de arriba hacia abajo en ese orden,
+   y el estado editable al tocar de una vez, sin entrar a la ficha. */
+function tablaConsultas(lista, conFecha) {
+  if (!lista.length) return `<div class="vacio">Sin consultas${conFecha ? " anteriores" : " registradas hoy"}.</div>`;
+  return `<div style="overflow-x:auto"><table>
+    <thead><tr><th>${conFecha ? "Fecha" : "Hora"}</th><th>Paciente</th><th>Motivo</th><th>Atendió</th><th>Estado</th><th></th></tr></thead>
+    <tbody>${lista.map(c => `<tr>
+      <td>${conFecha ? fecha(c.fecha) : horaTexto(c.fecha)}</td>
+      <td><b>${esc(c.nombre)}</b><div style="font-size:11.5px;color:var(--gris-cl)">${esc(c.tutor || "")}</div></td>
+      <td>${esc(c.motivo || "—")}</td>
+      <td>${esc(c.quien)}</td>
+      <td><select onchange="cambiarEstadoConsulta(${c.id}, this.value)" style="font-size:12.5px;padding:5px 8px;border-radius:7px;border:1px solid var(--linea)">
+        ${ESTADOS_CONSULTA.map(e => `<option ${e === (c.estado || "En espera") ? "selected" : ""}>${e}</option>`).join("")}
+      </select></td>
+      <td><button class="bot linea chico" onclick="ir('detalleConsulta', ${c.id})">Ver</button></td>
+    </tr>`).join("")}</tbody>
+  </table></div>`;
+}
+
 function verConsultas() {
-  const lista = [...BD.consultas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+  const hoy = BD.consultas.filter(c => esHoy(c.fecha)).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+  const anteriores = BD.consultas.filter(c => !esHoy(c.fecha)).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
   return `
     <div class="encab">
       <div>
         <h2>Consultas</h2>
-        <div class="sub">${lista.length} ${lista.length === 1 ? "consulta registrada" : "consultas registradas"}</div>
+        <div class="sub">${hoy.length} ${hoy.length === 1 ? "consulta hoy" : "consultas hoy"} · ${BD.consultas.length} en total</div>
       </div>
       <button class="bot" onclick="ir('nuevaConsulta')">+ Nueva consulta</button>
     </div>
-    ${lista.length ? `<div class="lista">${lista.map(c => `
-      <button class="tarjeta" onclick="ir('detalleConsulta', ${c.id})">
-        <div class="tira t-cerrado"></div>
-        <div class="adentro">
-          <div class="fila1">
-            <h3>${esc(c.nombre)}</h3>
-            <span class="chip c-box">${fecha(c.fecha)}</span>
-          </div>
-          <div class="meta">${[c.especie, c.raza, c.tutor].filter(Boolean).map(esc).join(" · ") || "—"}</div>
-          <div class="motivo">${esc(c.motivo || "Sin motivo de consulta registrado")}</div>
-          <div class="pie"><div><span>Atendió</span><b>${esc(c.quien)}</b></div></div>
-        </div>
-      </button>`).join("")}</div>`
-      : `<div class="panel"><div class="vacio">Todavía no hay consultas registradas.</div></div>`}`;
+
+    <div class="panel">
+      <h3>Hoy</h3>
+      ${tablaConsultas(hoy, false)}
+    </div>
+
+    ${anteriores.length ? `<div class="panel"><h3>Anteriores</h3>${tablaConsultas(anteriores, true)}</div>` : ""}`;
 }
 
 /* ── Formulario (sirve para crear y para editar) ──────────────────── */
@@ -167,7 +197,12 @@ function verDetalleConsulta() {
         <h2 style="margin-top:10px">${esc(c.nombre)}</h2>
         <div class="sub">${fecha(c.fecha)} · Atendió ${esc(c.quien)}</div>
       </div>
-      <button class="bot claro" onclick="ir('nuevaConsulta', ${c.id})">Editar</button>
+      <div class="botones">
+        <select onchange="cambiarEstadoConsulta(${c.id}, this.value)" style="padding:9px 12px;border-radius:9px;border:1px solid var(--linea)">
+          ${ESTADOS_CONSULTA.map(e => `<option ${e === (c.estado || "En espera") ? "selected" : ""}>${e}</option>`).join("")}
+        </select>
+        <button class="bot claro" onclick="ir('nuevaConsulta', ${c.id})">Editar</button>
+      </div>
     </div>
 
     <div class="panel">

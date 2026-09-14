@@ -102,7 +102,7 @@ async function cargarConsultasDesdeSupabase() {
   const { data, error } = await sb.from("consultas").select("*").order("fecha", { ascending: false });
   if (error) { console.error("No se pudieron leer las consultas:", error); return; }
   BD.consultas = data.map(c => ({
-    id: c.id, fecha: c.fecha, quien: c.quien,
+    id: c.id, fecha: c.fecha, quien: c.quien, estado: c.estado,
     nombre: c.nombre, especie: c.especie, raza: c.raza, edad: c.edad, peso: c.peso,
     esterilizado: c.esterilizado, conviveMascotas: c.convive_mascotas,
     enfermedadesPrevias: c.enfermedades_previas, tutor: c.tutor, telefono: c.telefono,
