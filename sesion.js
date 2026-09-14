@@ -62,5 +62,5 @@ function entrarAlSistema() {
   document.getElementById("pantallaLogin").innerHTML = "";
   vista = "bienvenida";
   suscribirCambiosHospital();
-  cargarPacientesDesdeSupabase();
+  cargarCatalogoDesdeSupabase().then(() => cargarPacientesDesdeSupabase());
 }

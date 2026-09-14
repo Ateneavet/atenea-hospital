@@ -1,13 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   DATOS Y GUARDADO
+   DATOS
 
-   Por ahora todo vive en el navegador del aparato donde se abre la app
-   (localStorage). Sirve para trabajar y para mostrar, pero todavía NO se
-   comparte entre el computador de recepción y el teléfono de la doctora.
-
-   Ese es el paso siguiente: mover esto mismo a una base en internet. La
-   forma de los datos ya está pensada para eso, así que el cambio no
-   obliga a reescribir las pantallas.
+   Hospital y Lista de precios viven en Supabase (ver supabase.js) y se
+   comparten en vivo entre todos los aparatos. Clientes, Agenda y
+   Peluquería siguen siendo datos de ejemplo en memoria — se conectan
+   cuando se venda ese módulo.
    ═══════════════════════════════════════════════════════════════════════ */
 
 const CLINICA = {
@@ -37,46 +34,16 @@ CLINICA.areas = AREAS_HOSPITAL.map(a => ({
    que ahora hay áreas. */
 CLINICA.boxes = CLINICA.areas.flatMap(a => a.jaulas);
 
-/* El catálogo de cargos. Cada vez que alguien registra un insumo o un
-   procedimiento en la ficha, se suma a la cuenta del paciente. Esa es la
-   razón por la que el equipo lo carga: si no se anota, no se cobra. */
-const CATALOGO = [
-  { grupo: "Hospitalización", items: [
-    { id: "hosp-dia",   nombre: "Día de hospitalización",        precio: 35000 },
-    { id: "hosp-uci",   nombre: "Día de hospitalización en UCI", precio: 55000 },
-  ]},
-  { grupo: "Procedimientos", items: [
-    { id: "pab-hora",   nombre: "Pabellón (por hora)",           precio: 120000 },
-    { id: "anestesia",  nombre: "Anestesia general",             precio: 55000 },
-    { id: "sonda-uret", nombre: "Sondaje uretral",               precio: 25000 },
-    { id: "curacion",   nombre: "Curación de herida",            precio: 12000 },
-  ]},
-  { grupo: "Exámenes e imágenes", items: [
-    { id: "hemograma",  nombre: "Hemograma",                     precio: 22000 },
-    { id: "perfil",     nombre: "Perfil bioquímico",             precio: 32000 },
-    { id: "rx",         nombre: "Radiografía digital",           precio: 28000 },
-    { id: "eco",        nombre: "Ecografía abdominal",           precio: 45000 },
-  ]},
-  { grupo: "Medicamentos", items: [
-    { id: "metadona",   nombre: "Metadona (dosis)",              precio: 6000 },
-    { id: "buprenor",   nombre: "Buprenorfina (dosis)",          precio: 7500 },
-    { id: "meloxicam",  nombre: "Meloxicam (dosis)",             precio: 4500 },
-    { id: "omeprazol",  nombre: "Omeprazol (dosis)",             precio: 3500 },
-    { id: "cefazolina", nombre: "Cefazolina (dosis)",            precio: 5500 },
-    { id: "calcio",     nombre: "Gluconato de calcio",           precio: 6500 },
-  ]},
-  { grupo: "Insumos", items: [
-    { id: "ringer",     nombre: "Ringer lactato 500 ml",         precio: 4500 },
-    { id: "fisiologico",nombre: "Suero fisiológico 500 ml",      precio: 4000 },
-    { id: "bajada",     nombre: "Bajada de suero",               precio: 3500 },
-    { id: "cateter",    nombre: "Catéter venoso",                precio: 4000 },
-    { id: "sonda-foley",nombre: "Sonda Foley",                   precio: 15000 },
-    { id: "isabelino",  nombre: "Collar isabelino",              precio: 8900 },
-    { id: "jeringa",    nombre: "Jeringa 3 ml",                  precio: 400 },
-  ]},
-];
+/* El catálogo de cargos — ahora vive en Supabase (tabla "catalogo") y
+   Norely lo edita sola desde "Lista de precios", sin depender de Luna.
+   Acá solo queda el orden en que se muestran los grupos (un grupo nuevo
+   que no esté en esta lista simplemente aparece al final) y las variables
+   que se llenan al iniciar sesión — ver cargarCatalogoDesdeSupabase() en
+   supabase.js. */
+const ORDEN_GRUPOS_CATALOGO = ["Hospitalización", "Procedimientos", "Exámenes e imágenes", "Medicamentos", "Insumos"];
 
-const CATALOGO_PLANO = CATALOGO.flatMap(g => g.items.map(i => ({ ...i, grupo: g.grupo })));
+let CATALOGO = [];
+let CATALOGO_PLANO = [];
 const buscarItem = id => CATALOGO_PLANO.find(i => i.id === id);
 
 /* ── Estado en memoria ─────────────────────────────────────────────
@@ -113,6 +80,7 @@ const SECCIONES = [
     { id: "caja", ic: "💳", texto: "Punto de venta & caja" },
   ]},
   { grupo: "Productos & servicios", items: [
+    { id: "precios",     ic: "🏷️", texto: "Lista de precios" },
     { id: "inventario", ic: "📦", texto: "Inventario & compras" },
   ]},
   { grupo: "Sistema", items: [

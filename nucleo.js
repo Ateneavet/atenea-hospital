@@ -87,7 +87,7 @@ function ir(v, id = null) {
 
 /* Secciones que hoy están construidas de verdad. El resto del menú
    (SECCIONES, en datos.js) se ve pero muestra "Próximamente". */
-const CONSTRUIDAS = new Set(["bienvenida", "hospital", "ficha", "boxes", "historial", "configuracion", "agenda", "clientes", "peluqueria"]);
+const CONSTRUIDAS = new Set(["bienvenida", "hospital", "ficha", "boxes", "historial", "configuracion", "agenda", "clientes", "peluqueria", "precios", "detalle"]);
 
 function pintar() {
   document.getElementById("nombreClinica").textContent = CLINICA.nombre;
@@ -108,7 +108,7 @@ function pintar() {
     bienvenida: verBienvenida, hospital: verHospital, ficha: verFicha,
     boxes: verBoxes, historial: verHistorial, configuracion: verAjustes,
     agenda: verAgenda, clientes: verClientes, peluqueria: verPeluqueria,
-    detalle: verDetalle,
+    detalle: verDetalle, precios: verListaPrecios,
   };
   document.getElementById("vista").innerHTML =
     (pantallas[vista] || (() => verProximamente(vista)))();

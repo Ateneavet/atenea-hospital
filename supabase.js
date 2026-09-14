@@ -94,6 +94,25 @@ async function asegurarCargosHospitalizacion() {
   return cambio;
 }
 
+/* ── Lista de precios ─────────────────────────────────────────────────
+   Igual que los pacientes: se trae de Supabase y se arma con la misma
+   forma que usaba el catálogo fijo de antes (grupos con items adentro),
+   para que precios.js, hospital.js y ficha.js no tengan que cambiar cómo
+   lo usan. */
+async function cargarCatalogoDesdeSupabase() {
+  const { data, error } = await sb.from("catalogo").select("*").order("nombre");
+  if (error) { console.error("No se pudo leer la lista de precios:", error); return; }
+
+  CATALOGO_PLANO = data.map(i => ({ id: i.id, nombre: i.nombre, precio: Number(i.precio), grupo: i.grupo }));
+
+  const grupos = [...new Set([...ORDEN_GRUPOS_CATALOGO, ...CATALOGO_PLANO.map(i => i.grupo)])];
+  CATALOGO = grupos
+    .map(grupo => ({ grupo, items: CATALOGO_PLANO.filter(i => i.grupo === grupo) }))
+    .filter(g => g.items.length);
+
+  pintar();
+}
+
 /* ── En vivo entre aparatos ───────────────────────────────────────────
    Cuando alguien carga algo desde su celular, este aparato se entera
    solo y se repinta — sin recargar la página. Se agrupan los avisos que
@@ -105,6 +124,12 @@ function _programarRecarga() {
   _reintentoCarga = setTimeout(() => cargarPacientesDesdeSupabase(), 200);
 }
 
+let _reintentoCatalogo = null;
+function _programarRecargaCatalogo() {
+  clearTimeout(_reintentoCatalogo);
+  _reintentoCatalogo = setTimeout(() => cargarCatalogoDesdeSupabase(), 200);
+}
+
 function suscribirCambiosHospital() {
   sb.channel("hospital-en-vivo")
     .on("postgres_changes", { event: "*", schema: "public", table: "pacientes" }, _programarRecarga)
@@ -112,5 +137,6 @@ function suscribirCambiosHospital() {
     .on("postgres_changes", { event: "*", schema: "public", table: "cargos" }, _programarRecarga)
     .on("postgres_changes", { event: "*", schema: "public", table: "farmacos" }, _programarRecarga)
     .on("postgres_changes", { event: "*", schema: "public", table: "administraciones" }, _programarRecarga)
+    .on("postgres_changes", { event: "*", schema: "public", table: "catalogo" }, _programarRecargaCatalogo)
     .subscribe();
 }
