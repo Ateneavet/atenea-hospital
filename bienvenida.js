@@ -15,6 +15,7 @@ function verBienvenida() {
   const r = reloj();
   const partes = BD.usuario.split(" ");
   const primerNombre = ["Dr.", "Dra."].includes(partes[0]) ? partes[1] : partes[0];
+  const agendaHoy = SESION.rol === "recepcion" ? BD.agenda : BD.agenda.filter(a => a.profesional === SESION.nombre);
 
   return `
     <div class="encab">
@@ -48,8 +49,8 @@ function verBienvenida() {
         </div>
 
         <div class="panel">
-          <h3>Agenda de hoy<span style="font-weight:400;color:var(--gris);font-size:12.5px">${BD.agenda.length} atenciones</span></h3>
-          ${tablaAgenda(BD.agenda.slice(0, 5), "agenda")}
+          <h3>${SESION.rol === "recepcion" ? "Agenda de hoy" : "Tu agenda de hoy"}<span style="font-weight:400;color:var(--gris);font-size:12.5px">${agendaHoy.length} ${agendaHoy.length === 1 ? "atención" : "atenciones"}</span></h3>
+          ${tablaAgenda(agendaHoy.slice(0, 5), "agenda")}
           <div class="adentro" style="padding-top:0"><button class="bot linea chico" onclick="ir('agenda')">Ver agenda completa →</button></div>
         </div>
       </div>

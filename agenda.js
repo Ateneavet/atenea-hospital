@@ -22,8 +22,13 @@ const ESTADOS_AGENDA = ["Confirmada", "En espera", "Atendiendo", "Finalizado", "
 function tablaAgenda(lista, clave) {
   if (!lista.length) return `<div class="vacio">Sin atenciones agendadas.</div>`;
   const puedeEditar = SESION.rol === "recepcion" || clave === "agendaPeluqueria";
+  /* En Agenda (médicos) cada turno tiene un botón directo a "Nueva
+     consulta", con el paciente, el tutor y el servicio ya rellenados —
+     así se ingresa una mascota desde acá mismo, sin pasar por otro lado.
+     No aplica a Peluquería: ahí no hay ficha clínica que abrir. */
+  const conAccion = clave === "agenda";
   return `<div style="overflow-x:auto"><table>
-    <thead><tr><th>Hora</th><th>Paciente</th><th>Servicio</th><th>Profesional</th><th>Estado</th></tr></thead>
+    <thead><tr><th>Hora</th><th>Paciente</th><th>Servicio</th><th>Profesional</th><th>Estado</th>${conAccion ? "<th></th>" : ""}</tr></thead>
     <tbody>${lista.map(a => {
       const idx = BD[clave].indexOf(a);
       return `<tr>
@@ -36,6 +41,8 @@ function tablaAgenda(lista, clave) {
             ${ESTADOS_AGENDA.map(e => `<option ${e === a.estado ? "selected" : ""}>${e}</option>`).join("")}
           </select>`
         : `<span class="chip c-${CLASE_ESTADO_AGENDA[a.estado] || "cerrado"}">${esc(a.estado)}</span>`}</td>
+      ${conAccion ? `<td><button class="bot linea chico" data-paciente="${esc(a.paciente)}" data-tutor="${esc(a.tutor)}" data-motivo="${esc(a.servicio)}"
+          onclick="nuevaConsultaDesdeTurno(this.dataset.paciente, this.dataset.tutor, this.dataset.motivo)">Nueva consulta</button></td>` : ""}
     </tr>`;
     }).join("")}</tbody>
   </table></div>`;
@@ -46,16 +53,34 @@ function cambiarEstadoTurno(clave, idx, valor) {
   anotar();
 }
 
+/* Cada médico entra viendo solo sus propios turnos de hoy (comparando
+   el nombre de su perfil con el campo "profesional" del turno);
+   recepción, al ser quien coordina a todos, parte viendo la agenda
+   completa. El botón de acá arriba deja cambiar de vista en cualquier
+   momento — null significa "todavía no la tocó", así que se usa el
+   default según el rol. */
+let _agendaSoloMia = null;
+function agendaSoloMia() {
+  return _agendaSoloMia === null ? SESION.rol !== "recepcion" : _agendaSoloMia;
+}
+function alternarAgendaSoloMia() {
+  _agendaSoloMia = !agendaSoloMia();
+  pintar();
+}
+
 function verAgenda() {
   const r = reloj();
+  const soloMia = agendaSoloMia();
+  const lista = soloMia ? BD.agenda.filter(a => a.profesional === SESION.nombre) : BD.agenda;
   return `
     <div class="encab">
-      <div><h2>Agenda &amp; recepción</h2><div class="sub">${BD.agenda.length} atenciones agendadas hoy · ${r.fecha}</div></div>
+      <div><h2>Agenda &amp; recepción</h2><div class="sub">${lista.length} ${lista.length === 1 ? "atención agendada" : "atenciones agendadas"} hoy${soloMia ? " · las tuyas" : ""} · ${r.fecha}</div></div>
+      <button class="bot linea chico" onclick="alternarAgendaSoloMia()">${soloMia ? "Ver agenda completa" : "Ver solo la mía"}</button>
     </div>
 
     <div class="panel">
       <h3>Hoy</h3>
-      ${tablaAgenda(BD.agenda, "agenda")}
+      ${tablaAgenda(lista, "agenda")}
     </div>
 
     ${panelPorAvisar(clientesPorAvisar())}

@@ -38,9 +38,21 @@ function verConsultas() {
 
 const OPCIONES_ESTERILIZADO = ["Sí", "No", "No sabe"];
 
+/* El botón "Nueva consulta" de un turno en Agenda deja el paciente, el
+   tutor y el motivo ya escritos acá, para no volver a teclearlos — se
+   usa una sola vez y se borra, así no se le queda pegado a la próxima
+   consulta que se abra desde el menú. */
+let _prellenoConsulta = null;
+function nuevaConsultaDesdeTurno(nombre, tutor, motivo) {
+  _prellenoConsulta = { nombre, tutor, motivo };
+  ir("nuevaConsulta");
+}
+
 function verNuevaConsulta() {
   const c = abierto ? BD.consultas.find(x => x.id === abierto) : null;
-  const v = campo => esc(c?.[campo] ?? "");
+  const preset = c ? null : _prellenoConsulta;
+  _prellenoConsulta = null;
+  const v = campo => esc(c?.[campo] ?? preset?.[campo] ?? "");
 
   return `
     <div class="encab">
