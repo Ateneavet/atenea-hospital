@@ -135,6 +135,20 @@ function fechaLarga(f) {
 const administracion = (p, farmacoId, hora) =>
   (p.administraciones || []).find(a => a.farmacoId === farmacoId && a.fecha === fechaHoy() && a.hora === hora);
 
+const FRECUENCIAS_FARMACO = ["Cada 4 horas", "Cada 6 horas", "Cada 8 horas", "Cada 12 horas", "Cada 24 horas", "SOS (a necesidad)"];
+
+/* La dosis se anota en mg/kg — nunca la dosis total — y acá se calcula
+   sola contra el peso real del paciente. Así nadie tiene que multiplicar
+   a mano ni puede anotar por error la dosis total en vez de la de por kg. */
+function dosisTexto(p, f) {
+  if (!f.dosisMgKg) return "";
+  const peso = pesoKg(p);
+  const total = peso
+    ? `${(f.dosisMgKg * peso).toLocaleString("es-CL", { maximumFractionDigits: 2 })} mg totales`
+    : "sin peso registrado para calcular el total";
+  return `${f.dosisMgKg} mg/kg → ${total}`;
+}
+
 function verFarmacos(p) {
   const filas = p.farmacos || [];
   const hoy = fechaHoy();
@@ -153,9 +167,12 @@ function verFarmacos(p) {
             }</tr></thead>
             <tbody>${filas.map(f => {
               const it = buscarItem(f.item);
+              const info = [dosisTexto(p, f), f.frecuencia, f.dias ? `por ${f.dias} ${f.dias === 1 ? "día" : "días"}` : ""]
+                .filter(Boolean).join(" · ");
               return `<tr>
-                <td>${esc(it?.nombre || f.item)}${dentro ? `
-                  <button class="quitar-fila" onclick="quitarFarmaco(${p.id},${f.id})" title="Quitar fármaco">✕</button>` : ""}</td>
+                <td><div>${esc(it?.nombre || f.item)}${dentro ? `
+                  <button class="quitar-fila" onclick="quitarFarmaco(${p.id},${f.id})" title="Quitar fármaco">✕</button>` : ""}</div>
+                  ${info ? `<div style="color:var(--gris);font-size:11.5px;font-weight:400">${esc(info)}</div>` : ""}</td>
                 ${Array.from({ length: 24 }, (_, h) => {
                   const marcada = !!administracion(p, f.id, h);
                   return `<td class="celda-hora ${marcada ? "marcada" : ""}"${
@@ -203,15 +220,28 @@ async function quitarFarmaco(idPac, farmacoId) {
 }
 
 function ventanaAgregarFarmaco(idPac) {
+  const p = paciente(idPac);
   const grupoMedicamentos = CATALOGO.find(g => g.grupo === "Medicamentos");
+  const peso = pesoKg(p);
   ventana(`
     <h3>Agregar fármaco</h3>
-    <div class="aclara">Va a quedar disponible para marcar hora por hora, hoy y los días que vengan.</div>
+    <div class="aclara">Va a quedar disponible para marcar hora por hora, hoy y los días que vengan.
+      ${peso ? ` El peso registrado de ${esc(p.nombre)} es <b>${peso} kg</b> — con eso se calcula la dosis total.`
+             : ` <b>${esc(p.nombre)} no tiene un peso numérico registrado</b> (dice "${esc(p.peso)}"), así que no se va a poder calcular la dosis total en mg.`}
+    </div>
     <form onsubmit="guardarFarmaco(event, ${idPac})">
       <label class="campo"><span>Fármaco</span>
         <select name="item" required>
           ${grupoMedicamentos.items.map(i => `<option value="${i.id}">${esc(i.nombre)}</option>`).join("")}
         </select></label>
+      <div class="dupla">
+        <label class="campo"><span>Dosis (mg/kg)</span>
+          <input name="dosisMgKg" type="number" min="0" step="0.01" required placeholder="5"></label>
+        <label class="campo"><span>Frecuencia</span>
+          <select name="frecuencia" required>${FRECUENCIAS_FARMACO.map(fr => `<option>${fr}</option>`).join("")}</select></label>
+      </div>
+      <label class="campo"><span>Por cuántos días</span>
+        <input name="dias" type="number" min="1" step="1" required placeholder="5"></label>
       <div class="botones">
         <button class="bot" type="submit">Agregar</button>
         <button class="bot linea" type="button" onclick="cerrar()">Cancelar</button>
@@ -222,7 +252,12 @@ function ventanaAgregarFarmaco(idPac) {
 async function guardarFarmaco(e, idPac) {
   e.preventDefault();
   const f = new FormData(e.target);
-  await sb.from("farmacos").insert({ paciente_id: idPac, item: f.get("item") });
+  await sb.from("farmacos").insert({
+    paciente_id: idPac, item: f.get("item"),
+    dosis_mg_kg: parseFloat(f.get("dosisMgKg")) || null,
+    frecuencia: f.get("frecuencia"),
+    dias: parseInt(f.get("dias"), 10) || null,
+  });
   cerrar();
   await cargarPacientesDesdeSupabase();
 }

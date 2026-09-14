@@ -43,6 +43,13 @@ function dias(desdeIso, hastaIso) {
 
 const NOMBRE_ESTADO = { estable: "Estable", delicado: "Delicado", critico: "Crítico" };
 
+/* El peso se anota como texto libre ("18,4 kg") porque así se ingresa
+   más rápido — esto le saca el número para poder calcular una dosis. */
+function pesoKg(p) {
+  const n = parseFloat(String(p.peso ?? "").replace(",", "."));
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
 const hospitalizados = () => BD.pacientes.filter(p => !p.egreso);
 const egresados = () => BD.pacientes.filter(p => p.egreso);
 const paciente = id => BD.pacientes.find(p => p.id === id);

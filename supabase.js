@@ -54,7 +54,7 @@ async function cargarPacientesDesdeSupabase(revisarCargosAutomaticos = true) {
     cargos: (cargos || []).filter(c => c.paciente_id === p.id)
       .map(c => ({ id: c.id, cuando: c.cuando, item: c.item, cantidad: c.cantidad, quien: c.quien })),
     farmacos: (farmacos || []).filter(f => f.paciente_id === p.id)
-      .map(f => ({ id: f.id, item: f.item, agregado: f.agregado })),
+      .map(f => ({ id: f.id, item: f.item, agregado: f.agregado, dosisMgKg: f.dosis_mg_kg, frecuencia: f.frecuencia, dias: f.dias })),
     administraciones: (administraciones || []).filter(a => a.paciente_id === p.id)
       .map(a => ({ id: a.id, farmacoId: a.farmaco_id, fecha: a.fecha, hora: a.hora, quien: a.quien, cuando: a.cuando, cargoId: a.cargo_id })),
   }));
