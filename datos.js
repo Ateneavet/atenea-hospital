@@ -54,6 +54,7 @@ const buscarItem = id => CATALOGO_PLANO.find(i => i.id === id);
    memoria — se conectan a una base de verdad cuando se venda ese módulo. */
 let BD = {
   pacientes: [],
+  consultas: [],
   usuario: null,
   clientes: clientesEjemplo(),
   agenda: agendaEjemplo(),
@@ -71,6 +72,7 @@ const SECCIONES = [
     { id: "bienvenida", ic: "🏠", texto: "Bienvenida" },
   ]},
   { grupo: "Clínica & pacientes", items: [
+    { id: "consultas",  ic: "🩺", texto: "Consultas" },
     { id: "hospital",   ic: "🏥", texto: "Hospital" },
     { id: "agenda",     ic: "🗓️", texto: "Agenda & recepción" },
     { id: "clientes",   ic: "🐾", texto: "Clientes & pacientes" },
@@ -89,9 +91,10 @@ const SECCIONES = [
   ]},
 ];
 
-/* Pantallas que ya viven adentro de Hospital y no van en el menú
-   principal (se llega a ellas desde una tarjeta, no desde el sidebar). */
-const SECCIONES_INTERNAS = ["ficha", "historial", "detalle"];
+/* Pantallas que ya viven adentro de Hospital o Consultas y no van en el
+   menú principal (se llega a ellas desde una tarjeta o un botón, no
+   desde el sidebar). */
+const SECCIONES_INTERNAS = ["ficha", "historial", "detalle", "nuevaConsulta", "detalleConsulta"];
 
 /* ═══════════════════════════════════════════════════════════════════════
    CLIENTES Y VACUNAS

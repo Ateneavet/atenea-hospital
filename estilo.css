@@ -162,6 +162,7 @@ main{padding:18px 0 40px}
 .campo input:focus,.campo select:focus,.campo textarea:focus{
       outline:2px solid var(--verde-cl);border-color:var(--verde)}
 .dupla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fila-signos{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px}
 
 .bot{border:0;border-radius:10px;padding:12px 18px;font-weight:600;cursor:pointer;
      background:var(--verde);color:#fff;font-size:15px}

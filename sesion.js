@@ -63,4 +63,5 @@ function entrarAlSistema() {
   vista = "bienvenida";
   suscribirCambiosHospital();
   cargarCatalogoDesdeSupabase().then(() => cargarPacientesDesdeSupabase());
+  cargarConsultasDesdeSupabase();
 }

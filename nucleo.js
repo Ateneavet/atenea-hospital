@@ -94,14 +94,17 @@ function ir(v, id = null) {
 
 /* Secciones que hoy están construidas de verdad. El resto del menú
    (SECCIONES, en datos.js) se ve pero muestra "Próximamente". */
-const CONSTRUIDAS = new Set(["bienvenida", "hospital", "ficha", "boxes", "historial", "configuracion", "agenda", "clientes", "peluqueria", "precios", "detalle"]);
+const CONSTRUIDAS = new Set(["bienvenida", "hospital", "ficha", "boxes", "historial", "configuracion", "agenda", "clientes", "peluqueria", "precios", "detalle", "consultas", "nuevaConsulta", "detalleConsulta"]);
 
 function pintar() {
   document.getElementById("nombreClinica").textContent = CLINICA.nombre;
   document.getElementById("usuarioActual").textContent = BD.usuario;
 
   // Qué botón del sidebar queda marcado según la pantalla abierta.
-  const activo = { ficha: "hospital", historial: "hospital", detalle: "hospital" }[vista] || vista;
+  const activo = {
+    ficha: "hospital", historial: "hospital", detalle: "hospital",
+    nuevaConsulta: "consultas", detalleConsulta: "consultas",
+  }[vista] || vista;
 
   document.getElementById("menu").innerHTML = SECCIONES.map(g => `
     ${g.grupo ? `<div class="grupo-titulo">${g.grupo}</div>` : ""}
@@ -116,6 +119,7 @@ function pintar() {
     boxes: verBoxes, historial: verHistorial, configuracion: verAjustes,
     agenda: verAgenda, clientes: verClientes, peluqueria: verPeluqueria,
     detalle: verDetalle, precios: verListaPrecios,
+    consultas: verConsultas, nuevaConsulta: verNuevaConsulta, detalleConsulta: verDetalleConsulta,
   };
   document.getElementById("vista").innerHTML =
     (pantallas[vista] || (() => verProximamente(vista)))();

@@ -71,6 +71,36 @@ create table if not exists public.administraciones (
   cargo_id     bigint references public.cargos(id) on delete set null
 );
 
+-- Consultas: la ficha de una atención común, sin jaula ni internación.
+-- Vive aparte de "pacientes" (que es solo para Hospital) — cualquiera del
+-- equipo la abre y la llena completa, de principio a fin.
+create table if not exists public.consultas (
+  id                    bigint generated always as identity primary key,
+  fecha                 timestamptz not null default now(),
+  quien                 text not null,
+  nombre                text not null,
+  especie               text,
+  raza                  text,
+  edad                  text,
+  peso                  text,
+  esterilizado          text,
+  convive_mascotas      text,
+  enfermedades_previas  text,
+  tutor                 text,
+  telefono              text,
+  motivo                text,
+  anamnesis_remota      text,
+  anamnesis_actual      text,
+  fc                    text,
+  fr                    text,
+  temperatura           text,
+  examen_fisico         text,
+  prediagnosticos       text,
+  examenes_solicitados  text,
+  orden_medica          text,
+  proximo_control       text
+);
+
 create table if not exists public.perfiles (
   id      uuid primary key references auth.users(id) on delete cascade,
   email   text,
@@ -107,6 +137,7 @@ alter table public.eventos         enable row level security;
 alter table public.cargos          enable row level security;
 alter table public.farmacos        enable row level security;
 alter table public.administraciones enable row level security;
+alter table public.consultas       enable row level security;
 alter table public.perfiles        enable row level security;
 
 create policy "equipo autenticado, todo" on public.pacientes
@@ -119,12 +150,14 @@ create policy "equipo autenticado, todo" on public.farmacos
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "equipo autenticado, todo" on public.administraciones
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "equipo autenticado, todo" on public.consultas
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "equipo autenticado lee perfiles" on public.perfiles
   for select using (auth.role() = 'authenticated');
 
 -- ── Para que un cambio en un aparato se vea al tiro en los demás ───────
 alter publication supabase_realtime add table
-  public.pacientes, public.eventos, public.cargos, public.farmacos, public.administraciones;
+  public.pacientes, public.eventos, public.cargos, public.farmacos, public.administraciones, public.consultas;
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- DATOS DE EJEMPLO — los mismos tres pacientes que ya se le mostraron:

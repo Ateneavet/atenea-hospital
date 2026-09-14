@@ -94,6 +94,26 @@ async function asegurarCargosHospitalizacion() {
   return cambio;
 }
 
+/* ── Consultas ─────────────────────────────────────────────────────────
+   Ficha de una atención común, sin jaula ni internación: vive en su
+   propia tabla ("consultas"), separada de Hospital. */
+
+async function cargarConsultasDesdeSupabase() {
+  const { data, error } = await sb.from("consultas").select("*").order("fecha", { ascending: false });
+  if (error) { console.error("No se pudieron leer las consultas:", error); return; }
+  BD.consultas = data.map(c => ({
+    id: c.id, fecha: c.fecha, quien: c.quien,
+    nombre: c.nombre, especie: c.especie, raza: c.raza, edad: c.edad, peso: c.peso,
+    esterilizado: c.esterilizado, conviveMascotas: c.convive_mascotas,
+    enfermedadesPrevias: c.enfermedades_previas, tutor: c.tutor, telefono: c.telefono,
+    motivo: c.motivo, anamnesisRemota: c.anamnesis_remota, anamnesisActual: c.anamnesis_actual,
+    fc: c.fc, fr: c.fr, temperatura: c.temperatura, examenFisico: c.examen_fisico,
+    prediagnosticos: c.prediagnosticos, examenesSolicitados: c.examenes_solicitados,
+    ordenMedica: c.orden_medica, proximoControl: c.proximo_control,
+  }));
+  pintar();
+}
+
 /* ── Lista de precios ─────────────────────────────────────────────────
    Igual que los pacientes: se trae de Supabase y se arma con la misma
    forma que usaba el catálogo fijo de antes (grupos con items adentro),
@@ -130,6 +150,12 @@ function _programarRecargaCatalogo() {
   _reintentoCatalogo = setTimeout(() => cargarCatalogoDesdeSupabase(), 200);
 }
 
+let _reintentoConsultas = null;
+function _programarRecargaConsultas() {
+  clearTimeout(_reintentoConsultas);
+  _reintentoConsultas = setTimeout(() => cargarConsultasDesdeSupabase(), 200);
+}
+
 function suscribirCambiosHospital() {
   sb.channel("hospital-en-vivo")
     .on("postgres_changes", { event: "*", schema: "public", table: "pacientes" }, _programarRecarga)
@@ -138,5 +164,6 @@ function suscribirCambiosHospital() {
     .on("postgres_changes", { event: "*", schema: "public", table: "farmacos" }, _programarRecarga)
     .on("postgres_changes", { event: "*", schema: "public", table: "administraciones" }, _programarRecarga)
     .on("postgres_changes", { event: "*", schema: "public", table: "catalogo" }, _programarRecargaCatalogo)
+    .on("postgres_changes", { event: "*", schema: "public", table: "consultas" }, _programarRecargaConsultas)
     .subscribe();
 }
