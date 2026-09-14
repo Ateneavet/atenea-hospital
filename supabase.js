@@ -110,6 +110,7 @@ async function cargarConsultasDesdeSupabase() {
     fc: c.fc, fr: c.fr, temperatura: c.temperatura, examenFisico: c.examen_fisico,
     prediagnosticos: c.prediagnosticos, examenesSolicitados: c.examenes_solicitados,
     ordenMedica: c.orden_medica, proximoControl: c.proximo_control,
+    cobroCategoria: c.cobro_categoria, cobroMonto: c.cobro_monto,
   }));
   pintar();
 }

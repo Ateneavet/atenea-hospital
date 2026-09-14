@@ -100,7 +100,9 @@ create table if not exists public.consultas (
   prediagnosticos       text,
   examenes_solicitados  text,
   orden_medica          text,
-  proximo_control       text
+  proximo_control       text,
+  cobro_categoria       text,
+  cobro_monto           integer
 );
 
 -- Vacunas aplicadas: una fila por dosis puesta en una Consulta, con su
@@ -121,10 +123,11 @@ create table if not exists public.vacunas_aplicadas (
 );
 
 create table if not exists public.perfiles (
-  id      uuid primary key references auth.users(id) on delete cascade,
-  email   text,
-  nombre  text not null,
-  rol     text not null default 'clinico' check (rol in ('clinico','recepcion'))
+  id                uuid primary key references auth.users(id) on delete cascade,
+  email             text,
+  nombre            text not null,
+  rol               text not null default 'clinico' check (rol in ('clinico','recepcion')),
+  acceso_finanzas   boolean not null default false
 );
 
 -- ── Quién puede entrar cuando se crea una cuenta nueva ──────────────────

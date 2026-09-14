@@ -67,6 +67,7 @@ function verConsultas() {
 /* ── Formulario (sirve para crear y para editar) ──────────────────── */
 
 const OPCIONES_ESTERILIZADO = ["Sí", "No", "No sabe"];
+const CATEGORIAS_COBRO = ["Consulta", "Vacuna", "Ecografía", "Radiografía", "Cirugía", "Otro"];
 
 const VACUNAS_POR_ESPECIE = {
   Canina: ["Séxtuple", "Antirrábica", "KC (tos de las perreras)"],
@@ -164,6 +165,21 @@ function verNuevaConsulta() {
         </div>
       </div>
 
+      <div class="panel">
+        <h3>Cobro</h3>
+        <div class="adentro">
+          <div class="dupla">
+            <label class="campo"><span>Categoría de cobro</span>
+              <select name="cobroCategoria">
+                <option value="">— Sin cobro —</option>
+                ${CATEGORIAS_COBRO.map(cat => `<option ${cat === c?.cobroCategoria ? "selected" : ""}>${cat}</option>`).join("")}
+              </select></label>
+            <label class="campo"><span>Monto</span>
+              <input name="cobroMonto" type="number" min="0" step="1" placeholder="15000" value="${c?.cobroMonto || ""}"></label>
+          </div>
+        </div>
+      </div>
+
       ${!c ? `
       <div class="panel">
         <h3>Vacunación</h3>
@@ -208,6 +224,8 @@ async function guardarConsulta(e, id) {
     fc: t("fc"), fr: t("fr"), temperatura: t("temperatura"), examen_fisico: t("examenFisico"),
     prediagnosticos: t("prediagnosticos"), examenes_solicitados: t("examenesSolicitados"),
     orden_medica: t("ordenMedica"), proximo_control: t("proximoControl"),
+    cobro_categoria: t("cobroCategoria") || null,
+    cobro_monto: f.get("cobroMonto") ? Math.max(0, parseInt(f.get("cobroMonto"), 10) || 0) : null,
   };
   const resultado = id
     ? await sb.from("consultas").update(datos).eq("id", id).select().single()
@@ -295,5 +313,9 @@ function verDetalleConsulta() {
     ${bloque("Prediagnósticos", c.prediagnosticos)}
     ${bloque("Exámenes solicitados", c.examenesSolicitados)}
     ${bloque("Orden médica", c.ordenMedica)}
-    ${bloque("Próxima consulta / control", c.proximoControl)}`;
+    ${bloque("Próxima consulta / control", c.proximoControl)}
+    ${c.cobroMonto ? `<div class="panel"><h3>Cobro</h3><div class="adentro">
+      <b style="font-size:19px">${plata(c.cobroMonto)}</b>
+      <span style="color:var(--gris);font-size:13px"> · ${esc(c.cobroCategoria || "Otro")}</span>
+    </div></div>` : ""}`;
 }

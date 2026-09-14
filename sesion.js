@@ -38,13 +38,13 @@ async function intentarLogin(e) {
 }
 
 async function cargarPerfilYEntrar(userId) {
-  const { data: perfil, error } = await sb.from("perfiles").select("nombre,rol").eq("id", userId).single();
+  const { data: perfil, error } = await sb.from("perfiles").select("nombre,rol,acceso_finanzas").eq("id", userId).single();
   if (error || !perfil) {
     mostrarLogin("Esta cuenta no tiene un perfil asignado todavía. Avísale a Luna.");
     await sb.auth.signOut();
     return;
   }
-  SESION = { nombre: perfil.nombre, rol: perfil.rol };
+  SESION = { nombre: perfil.nombre, rol: perfil.rol, accesoFinanzas: !!perfil.acceso_finanzas };
   BD.usuario = perfil.nombre;
   entrarAlSistema();
 }
