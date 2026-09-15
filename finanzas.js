@@ -108,17 +108,17 @@ function verFinanzas() {
           <div><span>Neto del período</span><span>${plata(desgloseIva(total).neto)}</span></div>
           <div><span>IVA (19%, incluido en los precios)</span><span>${plata(desgloseIva(total).iva)}</span></div>
         </div>` : ""}
-        ${total ? CATEGORIAS_FINANZAS.filter(c => totales[c] > 0).sort((a, b) => totales[b] - totales[a]).map(c => `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--linea-2)">
+        ${[...CATEGORIAS_FINANZAS].sort((a, b) => totales[b] - totales[a]).map(c => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--linea-2)${totales[c] ? "" : ";opacity:.5"}">
             <div style="display:flex;align-items:center;gap:8px">
               <span style="width:10px;height:10px;border-radius:3px;background:${COLOR_CATEGORIA_FINANZAS[c]};display:inline-block"></span>
               ${c}
             </div>
             <div style="display:flex;gap:14px;align-items:baseline">
-              <span style="color:var(--gris);font-size:12.5px">${Math.round(totales[c] / total * 100)}%</span>
+              <span style="color:var(--gris);font-size:12.5px">${total ? Math.round(totales[c] / total * 100) : 0}%</span>
               <b style="font-variant-numeric:tabular-nums">${plata(totales[c])}</b>
             </div>
-          </div>`).join("") : `<div class="vacio">Sin ingresos registrados en este período.</div>`}
+          </div>`).join("")}
       </div>
     </div>`;
 }
