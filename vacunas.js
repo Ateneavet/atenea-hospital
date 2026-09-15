@@ -5,12 +5,9 @@
    guardada acá con su próxima fecha (hoy + los meses que corresponda).
    Este archivo junta a quienes tienen una vacuna vencida o por vencer en
    los próximos 30 días, para que recepción los llame antes de que se
-   pierdan — lo usan Bienvenida, Agenda y Recordatorios.
-
-   OJO: esto es distinto de clientesEjemplo() / estadoVacuna() en
-   datos.js, que son los diez clientes de ejemplo de la pantalla
-   "Clientes & pacientes" — esa sigue siendo una maqueta, todavía no
-   conectada a datos reales.
+   pierdan — lo usan Bienvenida, Agenda, Recordatorios y Clientes &
+   pacientes (que arma su lista de pacientes agrupando estas mismas
+   vacunas, en clientes.js).
    ═══════════════════════════════════════════════════════════════════════ */
 
 const DIAS_AVISO_VACUNA = 30;

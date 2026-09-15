@@ -124,7 +124,7 @@ async function cargarVacunasDesdeSupabase() {
   if (error) { console.error("No se pudieron leer las vacunas:", error); return; }
   BD.vacunas = data.map(v => ({
     id: v.id, consultaId: v.consulta_id, paciente: v.paciente, tutor: v.tutor, telefono: v.telefono,
-    especie: v.especie, vacuna: v.vacuna, fechaAplicada: v.fecha_aplicada, proximaFecha: v.proxima_fecha,
+    especie: v.especie, vacuna: v.vacuna, email: v.email, fechaAplicada: v.fecha_aplicada, proximaFecha: v.proxima_fecha,
     quien: v.quien, avisado: v.avisado,
   }));
   pintar();

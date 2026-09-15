@@ -199,6 +199,8 @@ function verNuevaConsulta() {
                   <option value="24">24 meses</option>
                 </select></label>
             </div>
+            <label class="campo"><span>Email del tutor</span>
+              <input name="vacunaEmail" type="email" placeholder="Opcional — para campañas de promoción"></label>
             <div class="aclara" style="color:var(--gris);font-size:12.5px;margin-top:-6px">
               Con esto se calcula sola la próxima fecha y aparece en Recordatorios cuando se acerque.</div>
           </div>
@@ -245,7 +247,7 @@ async function guardarConsulta(e, id) {
     const aFecha = d => d.toISOString().slice(0, 10);
     const { error: errVacuna } = await sb.from("vacunas_aplicadas").insert({
       consulta_id: resultado.data.id, paciente: datos.nombre, tutor: datos.tutor,
-      telefono: datos.telefono, especie: datos.especie, vacuna: vacunaNombre,
+      telefono: datos.telefono, especie: datos.especie, vacuna: vacunaNombre, email: t("vacunaEmail") || null,
       fecha_aplicada: aFecha(hoyFecha), proxima_fecha: aFecha(proxima), quien: BD.usuario,
     });
     if (errVacuna) alert("La consulta se guardó, pero no se pudo registrar la vacuna.\n\n" + errVacuna.message);

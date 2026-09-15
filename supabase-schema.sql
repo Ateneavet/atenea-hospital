@@ -116,6 +116,7 @@ create table if not exists public.vacunas_aplicadas (
   telefono        text,
   especie         text,
   vacuna          text not null,
+  email           text,
   fecha_aplicada  date not null default current_date,
   proxima_fecha   date not null,
   quien           text not null,

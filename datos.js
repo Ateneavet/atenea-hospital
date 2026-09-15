@@ -58,7 +58,6 @@ let BD = {
   vacunas: [],
   cobrosPeluqueria: [],
   usuario: null,
-  clientes: clientesEjemplo(),
   agenda: agendaEjemplo(),
   agendaPeluqueria: peluqueriaEjemplo(),
 };
@@ -98,75 +97,6 @@ const SECCIONES = [
    menú principal (se llega a ellas desde una tarjeta o un botón, no
    desde el sidebar). */
 const SECCIONES_INTERNAS = ["ficha", "historial", "detalle", "nuevaConsulta", "detalleConsulta"];
-
-/* ═══════════════════════════════════════════════════════════════════════
-   CLIENTES Y VACUNAS
-
-   Esto es lo que hoy la clínica no tiene: quién es cada tutor, cómo
-   contactarlo y cuándo le toca la próxima vacuna a su mascota. Sin esto,
-   cada vacuna puesta es un cliente que se pierde apenas sale por la
-   puerta — nadie vuelve a avisarle.
-
-   El vencimiento se calcula solo, cada vez que se abre la pantalla, así
-   que nunca queda una fecha vieja mostrando algo que ya no es cierto.
-   ═══════════════════════════════════════════════════════════════════════ */
-
-const VACUNAS_CATALOGO = {
-  Canino: ["Séxtuple", "Antirrábica", "KC (tos de las perreras)"],
-  Felino: ["Triple felina", "Antirrábica", "Leucemia felina"],
-};
-
-/* Diez clientes de ejemplo: mascota, tutor, cómo contactarlo, y sus
-   vacunas con la fecha en que realmente les toca — algunas vencidas,
-   algunas por vencer esta semana, algunas recién puestas. */
-function clientesEjemplo() {
-  const hoy = new Date();
-  const en = n => new Date(hoy.getTime() + n * 86400000).toISOString();
-  const dosis = (nombre, diasProxima) => ({
-    nombre, ultima: en(diasProxima - 365), proxima: en(diasProxima),
-  });
-
-  return [
-    { id: 1001, nombre: "Simón",  especie: "Canino", tutor: "Antonia Vergara",   telefono: "+56 9 0000 0001", email: "antonia@ejemplo.cl",
-      vacunas: [dosis("Séxtuple", -58), dosis("Antirrábica", 210)] },
-    { id: 1002, nombre: "Frida",  especie: "Felino", tutor: "Camila Undurraga",  telefono: "+56 9 0000 0002", email: "camila@ejemplo.cl",
-      vacunas: [dosis("Triple felina", 5)] },
-    { id: 1003, nombre: "Tomás",  especie: "Canino", tutor: "Rodrigo Achondo",   telefono: "+56 9 0000 0003", email: "",
-      vacunas: [dosis("Antirrábica", -31), dosis("Séxtuple", 140)] },
-    { id: 1004, nombre: "Lola",   especie: "Canino", tutor: "Javiera Errázuriz", telefono: "+56 9 0000 0004", email: "javiera@ejemplo.cl",
-      vacunas: [dosis("Séxtuple", 40), dosis("Antirrábica", 300)] },
-    { id: 1005, nombre: "Pancho", especie: "Canino", tutor: "Sebastián Toro",    telefono: "+56 9 0000 0005", email: "",
-      vacunas: [dosis("KC (tos de las perreras)", -95)] },
-    { id: 1006, nombre: "Nube",   especie: "Felino", tutor: "Fernanda Mira",     telefono: "+56 9 0000 0006", email: "fernanda@ejemplo.cl",
-      vacunas: [dosis("Triple felina", 120), dosis("Antirrábica", 250)] },
-    { id: 1007, nombre: "Rocco",  especie: "Canino", tutor: "Ignacio Bulnes",    telefono: "+56 9 0000 0007", email: "ignacio@ejemplo.cl",
-      vacunas: [dosis("Séxtuple", 10)] },
-    { id: 1008, nombre: "Mila",   especie: "Canino", tutor: "Paula Jaramillo",   telefono: "+56 9 0000 0008", email: "paula@ejemplo.cl",
-      vacunas: [dosis("Antirrábica", -20), dosis("Séxtuple", 88)] },
-    { id: 1009, nombre: "Otto",   especie: "Canino", tutor: "Matías Cifuentes",  telefono: "+56 9 0000 0009", email: "",
-      vacunas: [dosis("Séxtuple", -64)] },
-    { id: 1010, nombre: "Kira",   especie: "Felino", tutor: "Valentina Ossa",    telefono: "+56 9 0000 0010", email: "valentina@ejemplo.cl",
-      vacunas: [dosis("Triple felina", 4)] },
-  ];
-}
-
-/* Estado de una dosis: vigente, por vencer (30 días o menos) o vencida.
-   Se recalcula siempre contra el reloj de hoy. */
-function estadoVacuna(v) {
-  const dias = Math.ceil((new Date(v.proxima) - new Date()) / 86400000);
-  if (dias < 0) return "vencida";
-  if (dias <= 30) return "por-vencer";
-  return "vigente";
-}
-
-const PESO_ESTADO_VACUNA = { vencida: 0, "por-vencer": 1, vigente: 2 };
-
-/* El peor estado entre todas las vacunas del cliente — así se le avisa
-   por la que más urge. */
-function peorVacuna(cliente) {
-  return [...cliente.vacunas].sort((a, b) =>
-    PESO_ESTADO_VACUNA[estadoVacuna(a)] - PESO_ESTADO_VACUNA[estadoVacuna(b)])[0];
-}
 
 /* La agenda de hoy: quién viene, a qué hora, con quién y para qué. Es
    una maqueta — todavía no hay un calendario de verdad detrás; sirve
