@@ -104,6 +104,10 @@ function verFinanzas() {
     <div class="panel">
       <h3>Detalle<span style="font-weight:400;color:var(--gris);font-size:12.5px">Total ${plata(total)}</span></h3>
       <div class="adentro">
+        ${total ? `<div class="resumen-iva" style="padding:0 0 10px;border-bottom:1px solid var(--linea-2);margin-bottom:6px">
+          <div><span>Neto del período</span><span>${plata(desgloseIva(total).neto)}</span></div>
+          <div><span>IVA (19%, incluido en los precios)</span><span>${plata(desgloseIva(total).iva)}</span></div>
+        </div>` : ""}
         ${total ? CATEGORIAS_FINANZAS.filter(c => totales[c] > 0).sort((a, b) => totales[b] - totales[a]).map(c => `
           <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--linea-2)">
             <div style="display:flex;align-items:center;gap:8px">

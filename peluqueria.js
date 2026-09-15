@@ -36,7 +36,7 @@ function verPeluqueria() {
     </div>
 
     <div class="panel">
-      <h3>Servicios &amp; precios</h3>
+      <h3>Servicios &amp; precios<span style="font-weight:400;color:var(--gris);font-size:12.5px">Precios finales, con IVA incluido</span></h3>
       <div style="overflow-x:auto"><table>
         <thead><tr><th>Servicio</th><th class="num">Precio</th></tr></thead>
         <tbody>${SERVICIOS_PELUQUERIA.map(s => `<tr>

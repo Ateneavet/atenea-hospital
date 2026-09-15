@@ -57,8 +57,19 @@ create table if not exists public.farmacos (
   id           bigint generated always as identity primary key,
   paciente_id  bigint not null references public.pacientes(id) on delete cascade,
   item         text not null,
-  agregado     timestamptz not null default now()
+  agregado     timestamptz not null default now(),
+  dosis_mg_kg  numeric,
+  frecuencia   text,
+  dias         int
 );
+
+-- Por si esto corre contra una base creada antes de que existieran estas
+-- tres columnas (se agregaron a mano en Supabase junto con "Agrega dosis
+-- por peso a los fármacos de Hospital" y este archivo no había quedado al
+-- día) — "if not exists" hace que sea seguro correrlo de nuevo.
+alter table public.farmacos add column if not exists dosis_mg_kg numeric;
+alter table public.farmacos add column if not exists frecuencia text;
+alter table public.farmacos add column if not exists dias int;
 
 create table if not exists public.administraciones (
   id           bigint generated always as identity primary key,

@@ -135,7 +135,50 @@ function fechaLarga(f) {
 const administracion = (p, farmacoId, hora) =>
   (p.administraciones || []).find(a => a.farmacoId === farmacoId && a.fecha === fechaHoy() && a.hora === hora);
 
-const FRECUENCIAS_FARMACO = ["Cada 4 horas", "Cada 6 horas", "Cada 8 horas", "Cada 12 horas", "Cada 24 horas", "SOS (a necesidad)"];
+/* "horas" es cada cuántas horas corresponde la dosis — con eso se pinta
+   roja la casilla que toca en la grilla. SOS no tiene periodicidad fija
+   (horas: null), así que nunca se pinta roja: se marca solo cuando se da,
+   a criterio de quien atiende. */
+const FRECUENCIAS_FARMACO = [
+  { texto: "Cada 4 horas", horas: 4 },
+  { texto: "Cada 6 horas", horas: 6 },
+  { texto: "Cada 8 horas", horas: 8 },
+  { texto: "Cada 12 horas", horas: 12 },
+  { texto: "Cada 24 horas", horas: 24 },
+  { texto: "SOS (a necesidad)", horas: null },
+];
+
+const horasFrecuencia = texto => FRECUENCIAS_FARMACO.find(fr => fr.texto === texto)?.horas ?? null;
+
+/* La hora de inicio del esquema es la hora en que se ingresó el fármaco
+   (f.agregado), tomada en punto — así "cada 4 horas" desde las 14:37
+   corresponde a las 14, 18, 22... Cruza la medianoche sin problema porque
+   se compara con la fecha completa, no solo con el número de hora. */
+function anclaFarmaco(f) {
+  const d = new Date(f.agregado);
+  d.setMinutes(0, 0, 0);
+  return d;
+}
+
+/* ¿La hora "h" de HOY es una de las que corresponde según la frecuencia,
+   contando desde que se ingresó el fármaco? No se pinta roja una hora
+   anterior al ingreso, ni una vez que se cumplieron los días del
+   tratamiento. */
+function correspondeFarmaco(f, h) {
+  const frecuenciaHoras = horasFrecuencia(f.frecuencia);
+  if (!frecuenciaHoras) return false;
+  const ancla = anclaFarmaco(f);
+  const hoy = new Date();
+  const columna = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), h, 0, 0, 0);
+  if (columna < ancla) return false;
+  if (f.dias) {
+    const fin = new Date(ancla);
+    fin.setHours(fin.getHours() + f.dias * 24);
+    if (columna >= fin) return false;
+  }
+  const horasTranscurridas = Math.round((columna - ancla) / 3600000);
+  return horasTranscurridas % frecuenciaHoras === 0;
+}
 
 /* La dosis se anota en mg/kg — nunca la dosis total — y acá se calcula
    sola contra el peso real del paciente. Así nadie tiene que multiplicar
@@ -159,7 +202,12 @@ function verFarmacos(p) {
     <div class="panel">
       <h3>Fármacos del día<span style="font-weight:400;color:var(--gris);font-size:12.5px">${fechaLarga(hoy)}</span></h3>
       <div class="adentro">
-        ${filas.length ? `<div style="overflow-x:auto">
+        ${filas.length ? `<div style="display:flex;gap:14px;align-items:center;margin-bottom:8px;font-size:11.5px;color:var(--gris)">
+          <span><span class="celda-hora corresponde" style="display:inline-block;width:12px;height:12px;vertical-align:middle;border-radius:3px"></span> Corresponde ahora</span>
+          <span><span class="celda-hora marcada" style="display:inline-block;width:12px;height:12px;vertical-align:middle;border-radius:3px"></span> Administrado</span>
+          <span>Doble clic para marcar o deshacer</span>
+        </div>
+        <div style="overflow-x:auto">
           <table class="grilla-farmacos">
             <thead><tr><th>Fármaco</th>${
               Array.from({ length: 24 }, (_, h) =>
@@ -175,8 +223,9 @@ function verFarmacos(p) {
                   ${info ? `<div style="color:var(--gris);font-size:11.5px;font-weight:400">${esc(info)}</div>` : ""}</td>
                 ${Array.from({ length: 24 }, (_, h) => {
                   const marcada = !!administracion(p, f.id, h);
-                  return `<td class="celda-hora ${marcada ? "marcada" : ""}"${
-                    dentro ? ` onclick="marcarFarmaco(${p.id},${f.id},${h})"` : ""}></td>`;
+                  const corresponde = !marcada && correspondeFarmaco(f, h);
+                  return `<td class="celda-hora ${marcada ? "marcada" : corresponde ? "corresponde" : ""}"${
+                    dentro ? ` ondblclick="marcarFarmaco(${p.id},${f.id},${h})" title="Doble clic para ${marcada ? "deshacer" : "marcar como administrado"}"` : ""}></td>`;
                 }).join("")}
               </tr>`;
             }).join("")}</tbody>
@@ -238,10 +287,12 @@ function ventanaAgregarFarmaco(idPac) {
         <label class="campo"><span>Dosis (mg/kg)</span>
           <input name="dosisMgKg" type="number" min="0" step="0.01" required placeholder="5"></label>
         <label class="campo"><span>Frecuencia</span>
-          <select name="frecuencia" required>${FRECUENCIAS_FARMACO.map(fr => `<option>${fr}</option>`).join("")}</select></label>
+          <select name="frecuencia" required>${FRECUENCIAS_FARMACO.map(fr => `<option value="${esc(fr.texto)}">${esc(fr.texto)}</option>`).join("")}</select></label>
       </div>
       <label class="campo"><span>Por cuántos días</span>
         <input name="dias" type="number" min="1" step="1" required placeholder="5"></label>
+      <label class="campo checkbox"><input type="checkbox" name="administradoAhora">
+        <span>Ya se le administró ahora, a las ${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}</span></label>
       <div class="botones">
         <button class="bot" type="submit">Agregar</button>
         <button class="bot linea" type="button" onclick="cerrar()">Cancelar</button>
@@ -252,12 +303,26 @@ function ventanaAgregarFarmaco(idPac) {
 async function guardarFarmaco(e, idPac) {
   e.preventDefault();
   const f = new FormData(e.target);
-  await sb.from("farmacos").insert({
-    paciente_id: idPac, item: f.get("item"),
+  const item = f.get("item");
+  const administradoAhora = f.get("administradoAhora") === "on";
+  const { data: farmaco, error } = await sb.from("farmacos").insert({
+    paciente_id: idPac, item,
     dosis_mg_kg: parseFloat(f.get("dosisMgKg")) || null,
     frecuencia: f.get("frecuencia"),
     dias: parseInt(f.get("dias"), 10) || null,
-  });
+  }).select().single();
+  if (error) { alert("No se pudo agregar el fármaco.\n\n" + error.message); return; }
+
+  if (administradoAhora) {
+    const { data: cargo, error: errorCargo } = await sb.from("cargos")
+      .insert({ paciente_id: idPac, item, cantidad: 1, quien: BD.usuario }).select().single();
+    if (!errorCargo) {
+      await sb.from("administraciones").insert({
+        farmaco_id: farmaco.id, paciente_id: idPac, fecha: fechaHoy(), hora: new Date().getHours(),
+        quien: BD.usuario, cargo_id: cargo.id,
+      });
+    }
+  }
   cerrar();
   await cargarPacientesDesdeSupabase();
 }

@@ -274,6 +274,7 @@ function verDetalle() {
     return { nombre: it?.nombre || c.item, cantidad: c.cantidad, precio, subtotal: precio * c.cantidad };
   });
   const total = filas.reduce((s, f) => s + f.subtotal, 0);
+  const iva = desgloseIva(total);
 
   return `
     <div class="encab no-imprimir">
@@ -314,9 +315,13 @@ function verDetalle() {
             </tr>`).join("") : `<tr><td colspan="4">Sin cargos registrados.</td></tr>`}
           </tbody>
         </table>
+        <div class="resumen-iva">
+          <div><span>Neto</span><span>${plata(iva.neto)}</span></div>
+          <div><span>IVA (19%, incluido)</span><span>${plata(iva.iva)}</span></div>
+        </div>
         <div class="total"><span>Total</span><span>${plata(total)}</span></div>
 
-        <div class="detalle-nota">Este documento es un detalle informativo de la atención. La boleta se emite aparte, en caja.</div>
+        <div class="detalle-nota">Este documento es un detalle informativo de la atención. La boleta se emite aparte, en caja. Precios finales, IVA incluido.</div>
       </div>
     </div>`;
 }

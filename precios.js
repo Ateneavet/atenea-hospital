@@ -25,7 +25,7 @@ function verListaPrecios() {
     <div class="encab">
       <div>
         <h2>Lista de precios</h2>
-        <div class="sub">${CATALOGO_PLANO.length} ${CATALOGO_PLANO.length === 1 ? "ítem" : "ítems"} · lo que se cobra en Hospital</div>
+        <div class="sub">${CATALOGO_PLANO.length} ${CATALOGO_PLANO.length === 1 ? "ítem" : "ítems"} · lo que se cobra en Hospital · precios finales, con IVA incluido</div>
       </div>
       <button class="bot" onclick="ventanaAgregarItem()">+ Agregar ítem</button>
     </div>
@@ -78,7 +78,7 @@ function ventanaAgregarItem() {
         <select name="grupo" onchange="mostrarGrupoNuevo(this)">${opcionesGrupoCatalogo(null)}</select></label>
       <label class="campo oculto-grupo-nuevo oculto"><span>Nombre del grupo nuevo</span>
         <input name="grupoNuevo" placeholder="Ej: Traumatología"></label>
-      <label class="campo"><span>Precio</span>
+      <label class="campo"><span>Precio (final, con IVA incluido)</span>
         <input name="precio" type="number" min="0" step="1" required placeholder="15000"></label>
       <div class="botones">
         <button class="bot" type="submit">Agregar</button>
@@ -117,7 +117,7 @@ function ventanaEditarItem(id) {
         <select name="grupo" onchange="mostrarGrupoNuevo(this)">${opcionesGrupoCatalogo(i.grupo)}</select></label>
       <label class="campo oculto-grupo-nuevo oculto"><span>Nombre del grupo nuevo</span>
         <input name="grupoNuevo" placeholder="Ej: Traumatología"></label>
-      <label class="campo"><span>Precio</span>
+      <label class="campo"><span>Precio (final, con IVA incluido)</span>
         <input name="precio" type="number" min="0" step="1" required value="${i.precio}"></label>
       <div class="botones">
         <button class="bot" type="submit">Guardar cambios</button>

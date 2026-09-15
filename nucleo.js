@@ -14,6 +14,16 @@ const esc = t => String(t ?? "").replace(/[&<>"']/g, c =>
 
 const plata = n => "$" + Math.round(n).toLocaleString("es-CL");
 
+/* Los precios del catálogo son finales, con el 19% de IVA ya incluido
+   (así se decidió con Luna) — esto solo separa cuánto de ese total es
+   neto y cuánto es IVA, para mostrarlo en la cuenta y en Finanzas. No
+   cambia lo que paga el tutor. */
+const TASA_IVA = 0.19;
+function desgloseIva(total) {
+  const neto = Math.round(total / (1 + TASA_IVA));
+  return { neto, iva: total - neto, total };
+}
+
 const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
 
 function fecha(iso) {

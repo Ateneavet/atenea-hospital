@@ -174,7 +174,7 @@ function verNuevaConsulta() {
                 <option value="">— Sin cobro —</option>
                 ${CATEGORIAS_COBRO.map(cat => `<option ${cat === c?.cobroCategoria ? "selected" : ""}>${cat}</option>`).join("")}
               </select></label>
-            <label class="campo"><span>Monto</span>
+            <label class="campo"><span>Monto (final, con IVA incluido)</span>
               <input name="cobroMonto" type="number" min="0" step="1" placeholder="15000" value="${c?.cobroMonto || ""}"></label>
           </div>
         </div>

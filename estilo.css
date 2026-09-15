@@ -161,6 +161,9 @@ main{padding:18px 0 40px}
 .campo textarea{min-height:78px;resize:vertical}
 .campo input:focus,.campo select:focus,.campo textarea:focus{
       outline:2px solid var(--verde-cl);border-color:var(--verde)}
+.campo.checkbox{display:flex;align-items:flex-start;gap:9px}
+.campo.checkbox input{width:auto;margin-top:2px}
+.campo.checkbox span{font-size:13.5px;font-weight:400;text-transform:none;letter-spacing:normal;color:var(--texto)}
 .dupla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .fila-signos{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px}
 
@@ -198,6 +201,8 @@ th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.08e
 td{padding:10px 16px;border-bottom:1px solid var(--linea-2);font-size:14.5px}
 tr:last-child td{border-bottom:0}
 .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.resumen-iva{padding:10px 16px 0}
+.resumen-iva div{display:flex;justify-content:space-between;font-size:13px;color:var(--gris);padding:2px 0}
 .total{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px;
        border-top:2px solid var(--linea);font-family:var(--display);font-size:21px;font-weight:700}
 
@@ -224,7 +229,10 @@ tr:last-child td{border-bottom:0}
 .grilla-farmacos thead th:first-child{background:var(--linea-2);z-index:2}
 .celda-hora{width:29px;height:34px;cursor:pointer}
 .celda-hora:hover{background:var(--verde-cl)}
+.celda-hora.corresponde{background:var(--rojo-cl)}
+.celda-hora.corresponde:hover{background:var(--rojo)}
 .celda-hora.marcada{background:var(--verde);position:relative}
+.celda-hora.marcada:hover{background:var(--verde)}
 .celda-hora.marcada::after{content:"✓";color:#fff;font-weight:700;font-size:12.5px}
 .quitar-fila{border:0;background:none;color:var(--gris-cl);cursor:pointer;margin-left:6px;
       font-size:11.5px;vertical-align:middle}
