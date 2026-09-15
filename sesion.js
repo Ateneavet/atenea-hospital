@@ -65,4 +65,5 @@ function entrarAlSistema() {
   cargarCatalogoDesdeSupabase().then(() => cargarPacientesDesdeSupabase());
   cargarConsultasDesdeSupabase();
   cargarVacunasDesdeSupabase();
+  cargarCobrosPeluqueriaDesdeSupabase();
 }

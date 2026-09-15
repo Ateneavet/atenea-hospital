@@ -12,10 +12,10 @@
    BD.pacientes ya están cargados con todo lo necesario.
    ═══════════════════════════════════════════════════════════════════════ */
 
-const CATEGORIAS_FINANZAS = ["Consulta", "Vacuna", "Ecografía", "Radiografía", "Cirugía", "Hospital", "Otro"];
+const CATEGORIAS_FINANZAS = ["Consulta", "Vacuna", "Ecografía", "Radiografía", "Cirugía", "Hospital", "Peluquería", "Otro"];
 const COLOR_CATEGORIA_FINANZAS = {
   Consulta: "#2F7D5C", Vacuna: "#3B6A8F", Ecografía: "#9A7420", Radiografía: "#B04430",
-  Cirugía: "#1D5540", Hospital: "#5F6A64", Otro: "#98A29B",
+  Cirugía: "#1D5540", Hospital: "#5F6A64", Peluquería: "#7A5C8E", Otro: "#98A29B",
 };
 
 function limitesPeriodoFinanzas(modo, fecha) {
@@ -40,6 +40,12 @@ function ingresosPorCategoria(desde, hasta) {
     if (f < desde || f >= hasta) return;
     totales.Hospital += (buscarItem(cg.item)?.precio || 0) * cg.cantidad;
   }));
+
+  BD.cobrosPeluqueria.forEach(c => {
+    const f = new Date(c.fecha);
+    if (f < desde || f >= hasta) return;
+    totales.Peluquería += Number(c.monto) || 0;
+  });
 
   return totales;
 }

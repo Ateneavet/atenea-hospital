@@ -130,6 +130,18 @@ async function cargarVacunasDesdeSupabase() {
   pintar();
 }
 
+/* ── Cobros de peluquería (alimenta Finanzas) ─────────────────────────── */
+
+async function cargarCobrosPeluqueriaDesdeSupabase() {
+  const { data, error } = await sb.from("cobros_peluqueria").select("*").order("fecha", { ascending: false });
+  if (error) { console.error("No se pudieron leer los cobros de peluquería:", error); return; }
+  BD.cobrosPeluqueria = data.map(c => ({
+    id: c.id, fecha: c.fecha, quien: c.quien, paciente: c.paciente, tutor: c.tutor,
+    servicio: c.servicio, monto: c.monto,
+  }));
+  pintar();
+}
+
 /* ── Lista de precios ─────────────────────────────────────────────────
    Igual que los pacientes: se trae de Supabase y se arma con la misma
    forma que usaba el catálogo fijo de antes (grupos con items adentro),
@@ -178,6 +190,12 @@ function _programarRecargaVacunas() {
   _reintentoVacunas = setTimeout(() => cargarVacunasDesdeSupabase(), 200);
 }
 
+let _reintentoCobrosPeluqueria = null;
+function _programarRecargaCobrosPeluqueria() {
+  clearTimeout(_reintentoCobrosPeluqueria);
+  _reintentoCobrosPeluqueria = setTimeout(() => cargarCobrosPeluqueriaDesdeSupabase(), 200);
+}
+
 function suscribirCambiosHospital() {
   sb.channel("hospital-en-vivo")
     .on("postgres_changes", { event: "*", schema: "public", table: "pacientes" }, _programarRecarga)
@@ -188,5 +206,6 @@ function suscribirCambiosHospital() {
     .on("postgres_changes", { event: "*", schema: "public", table: "catalogo" }, _programarRecargaCatalogo)
     .on("postgres_changes", { event: "*", schema: "public", table: "consultas" }, _programarRecargaConsultas)
     .on("postgres_changes", { event: "*", schema: "public", table: "vacunas_aplicadas" }, _programarRecargaVacunas)
+    .on("postgres_changes", { event: "*", schema: "public", table: "cobros_peluqueria" }, _programarRecargaCobrosPeluqueria)
     .subscribe();
 }

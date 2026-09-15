@@ -122,6 +122,19 @@ create table if not exists public.vacunas_aplicadas (
   avisado         boolean not null default false
 );
 
+-- Cobros de peluquería: alimenta la parte de Peluquería en Finanzas.
+-- La agenda de peluquería sigue siendo de ejemplo (peluqueria.js); esto
+-- es lo único de esa pantalla que es de verdad.
+create table if not exists public.cobros_peluqueria (
+  id        bigint generated always as identity primary key,
+  fecha     timestamptz not null default now(),
+  quien     text not null,
+  paciente  text not null,
+  tutor     text,
+  servicio  text not null,
+  monto     integer not null
+);
+
 create table if not exists public.perfiles (
   id                uuid primary key references auth.users(id) on delete cascade,
   email             text,
@@ -161,6 +174,7 @@ alter table public.farmacos        enable row level security;
 alter table public.administraciones enable row level security;
 alter table public.consultas       enable row level security;
 alter table public.vacunas_aplicadas enable row level security;
+alter table public.cobros_peluqueria enable row level security;
 alter table public.perfiles        enable row level security;
 
 create policy "equipo autenticado, todo" on public.pacientes
@@ -177,13 +191,15 @@ create policy "equipo autenticado, todo" on public.consultas
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "equipo autenticado, todo" on public.vacunas_aplicadas
   for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
+create policy "equipo autenticado, todo" on public.cobros_peluqueria
+  for all using (auth.role() = 'authenticated') with check (auth.role() = 'authenticated');
 create policy "equipo autenticado lee perfiles" on public.perfiles
   for select using (auth.role() = 'authenticated');
 
 -- ── Para que un cambio en un aparato se vea al tiro en los demás ───────
 alter publication supabase_realtime add table
   public.pacientes, public.eventos, public.cargos, public.farmacos, public.administraciones,
-  public.consultas, public.vacunas_aplicadas;
+  public.consultas, public.vacunas_aplicadas, public.cobros_peluqueria;
 
 -- ═══════════════════════════════════════════════════════════════════════
 -- DATOS DE EJEMPLO — los mismos tres pacientes que ya se le mostraron:

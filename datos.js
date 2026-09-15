@@ -56,6 +56,7 @@ let BD = {
   pacientes: [],
   consultas: [],
   vacunas: [],
+  cobrosPeluqueria: [],
   usuario: null,
   clientes: clientesEjemplo(),
   agenda: agendaEjemplo(),
